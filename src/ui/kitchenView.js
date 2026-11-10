@@ -95,8 +95,10 @@ export class KitchenScreen {
       } else {
         this.clock.resume('hidden');
         if (!this.clock.paused) this.sound.hold(false);
+        this.keepAwake();
       }
     };
+    this.keepAwake();
     this.onPageHide = () => this.finish({ silent: true });
     document.addEventListener('visibilitychange', this.onVisibility);
     window.addEventListener('pagehide', this.onPageHide);
@@ -108,7 +110,18 @@ export class KitchenScreen {
     return root;
   }
 
+  /** Keep the tablet screen on while cooking: long waits have no touches. */
+  keepAwake() {
+    try {
+      navigator.wakeLock?.request('screen').then((lock) => {
+        this.wakeLock = lock;
+        if (this.finished) lock.release().catch(() => {});
+      }).catch(() => {});
+    } catch { /* not supported */ }
+  }
+
   destroy() {
+    this.wakeLock?.release?.().catch(() => {});
     this.clock?.stop();
     this.off?.();
     this.sound.stopAllLoops();
@@ -216,7 +229,6 @@ export class KitchenScreen {
     this.jugEl = el('div', 'abs prop jug', jugSvg());
     this.root.append(this.place(this.jugEl, L.juice, L.z.counterItems));
     this.jugEl.addEventListener('pointerdown', () => this.tapJug());
-    this.jugEl.classList.toggle('hidden', this.dials.conc < 2);
     this.sinkKey = '';
     this.fridgeOpen = false;
   }
@@ -542,7 +554,6 @@ export class KitchenScreen {
         v.jb.classList.remove('hidden');
         this.pulse(v.jb, 'pop-in');
         this.setExpr(d.slot, 'thirsty');
-        this.jugEl.classList.remove('hidden');
         this.pulse(this.jugEl, 'bounce');
         s.play('thirsty');
         break;
@@ -994,7 +1005,9 @@ export class KitchenScreen {
     let s = null;
     if (this.tutorial) {
       if (this.idleReal > 0.9) s = k.suggest({ includeTimed: true });
-    } else if (this.idleReal > 9) {
+    } else if (this.idleReal > 9 && !k.stationList().some((st) => st.phase === 'ready' || st.phase === 'late')) {
+      // "Stuck" helper for things that are not timing: never while a dish needs
+      // attention, so it can neither cue the stove nor pull attention away from it.
       const g = k.suggest();
       if (g && g.blocking) s = g;
     }

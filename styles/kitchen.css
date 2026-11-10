@@ -213,7 +213,7 @@
 .fx-layer { z-index: 50; }
 
 .overlay { position: absolute; inset: 0; z-index: 80; display: grid; place-items: center; }
-.overlay.pause-menu { background: rgba(43, 26, 16, .55); backdrop-filter: blur(3px); }
+.overlay.pause-menu { background: rgba(43, 26, 16, .55); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
 .pause-card { display: grid; justify-items: center; gap: 30px; padding: 44px 60px; background: var(--paper); border: 6px solid var(--ink); border-radius: 48px; box-shadow: 0 12px 0 var(--ink); }
 .pause-play { width: 190px; height: 190px; border-width: 7px; box-shadow: 0 10px 0 var(--ink); }
 .pause-row { display: flex; gap: 22px; }
@@ -233,3 +233,15 @@
 .levelup-stars svg:nth-child(3) { animation-delay: .3s; }
 @keyframes levelup { 0% { transform: scale(0) rotate(-20deg); opacity: 0; } 14% { transform: scale(1.15) rotate(4deg); opacity: 1; } 22% { transform: scale(1) rotate(0); } 82% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ------------------------------------------------------- ambient life */
+
+@keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.012, 1.022); } }
+.customer:not(.calling):not(.joy):not(.shake):not(.bounce) .cust-art { animation: breathe 3.2s ease-in-out infinite; }
+.customer:nth-child(2):not(.calling):not(.joy):not(.shake):not(.bounce) .cust-art { animation-delay: -1.4s; }
+@keyframes drift { 0%, 100% { transform: translateX(-8px); } 50% { transform: translateX(14px); } }
+.window .cloud { animation: drift 16s ease-in-out infinite; }
+.window .cloud.c2 { animation-duration: 22s; animation-delay: -6s; }
+.pet { transform-origin: 50% 100%; }
+.pet.bounce { animation: chef-hop .4s ease-out 2; }
+.jug.bounce { animation: bounce .5s var(--pop) 2; }
