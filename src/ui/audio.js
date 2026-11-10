@@ -35,7 +35,7 @@ export class Sound {
       const d = this.noiseBuf.getChannelData(0);
       for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     }
-    if (this.ctx.state === 'suspended' && !this.held) this.ctx.resume();
+    if (this.ctx.state !== 'running' && this.ctx.state !== 'closed' && !this.held) this.ctx.resume().catch(() => {});
     if (this.wantMusic && !this.musicTimer) this.startMusic();
   }
 
@@ -57,7 +57,7 @@ export class Sound {
   hold(on) {
     this.held = on;
     if (!this.ctx) return;
-    if (on) this.ctx.suspend(); else this.ctx.resume();
+    if (on) this.ctx.suspend().catch(() => {}); else this.ctx.resume().catch(() => {});
   }
 
   // ------------------------------------------------------------ primitives

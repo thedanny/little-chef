@@ -269,7 +269,28 @@ export class ParentScreen {
           <button class="btn text cream danger" data-act="reset">Reset progress</button>
           <button class="btn text cream danger" data-act="delete">Delete profile</button>
         </div>
+      </section>
+
+      <section class="pm-card pm-wide">
+        <h2>Recent sessions</h2>
+        ${this.sessionTable(p)}
       </section>`;
+  }
+
+  sessionTable(p) {
+    const rows = p.stats.sessions.slice(-8).reverse();
+    if (!rows.length) return '<div class="pm-empty">No sessions yet</div>';
+    const date = (ms) => new Date(ms).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+    return `<table class="pm-table">
+      <thead><tr><th>Date</th><th>Minutes</th><th>Orders</th><th>Perfect</th><th>Late</th><th>Burnt</th><th>Left</th><th>Success</th><th>Reaction</th><th>Spaced out</th><th>Peeks</th><th>Level</th></tr></thead>
+      <tbody>${rows.map((s) => `<tr>
+        <td>${date(s.date)}</td><td>${(s.durationSec / 60).toFixed(1)}</td><td>${s.orders}</td>
+        <td>${s.perfect}</td><td>${s.late}</td><td>${s.ruined}</td><td>${s.abandoned}</td>
+        <td>${s.orders ? pct(s.success / s.orders) : '–'}</td><td>${s.avgRt == null ? '–' : `${num(s.avgRt)} s`}</td>
+        <td>${s.spaceOuts}</td><td>${s.peeks}</td>
+        <td>${s.levelStart + 1}${s.levelEnd !== s.levelStart ? ` → ${s.levelEnd + 1}` : ''}</td>
+      </tr>`).join('')}</tbody></table>
+      <p class="pm-note"><b>Peeks</b> are taps on a station that was still cooking – a healthy checking strategy on the silent levels. <b>Left</b> counts customers who gave up waiting.</p>`;
   }
 
   bindChild(p) {

@@ -71,8 +71,10 @@ class App {
 
     // Browsers only allow audio after a touch.
     const unlock = () => sound.unlock();
-    window.addEventListener('pointerdown', unlock, { passive: true });
-    window.addEventListener('keydown', unlock);
+    // (iOS only counts the end of a touch as a "gesture", so listen to both ends.)
+    for (const type of ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown']) {
+      window.addEventListener(type, unlock, { passive: true });
+    }
     // No accidental zoom / context menu / drag on a kid's tablet.
     window.addEventListener('contextmenu', (e) => e.preventDefault());
     window.addEventListener('dragstart', (e) => e.preventDefault());

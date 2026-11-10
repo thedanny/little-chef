@@ -187,3 +187,8 @@
   #rotate svg { width: 46vw; height: 46vw; animation: rotate-hint 1.8s ease-in-out infinite; }
 }
 @keyframes rotate-hint { 0%, 20% { transform: rotate(0); } 60%, 100% { transform: rotate(90deg); } }
+
+.pm-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.pm-table th { text-align: left; font-size: 13px; color: #8a6d55; padding: 4px 8px; border-bottom: 2px solid #e6dbc7; white-space: nowrap; }
+.pm-table td { padding: 7px 8px; border-bottom: 1px solid #efe6d5; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pm-table tr:last-child td { border-bottom: 0; }
