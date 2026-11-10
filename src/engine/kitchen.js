@@ -663,7 +663,10 @@ export class Kitchen {
     this.spawnTimer -= dt;
     if (this.spawnTimer > 0) return;
     const slot = [0, 1].find((s) => !this.customers[s] && !this.tablePlates[s]);
-    if (slot === undefined) return;
+    if (slot === undefined) {
+      this.spawnTimer = 1.5; // full house: look again shortly, so a freed seat is not refilled instantly
+      return;
+    }
     this.spawnCustomer(slot);
     this.spawnTimer = this.dials.conc >= 1 ? this.rng.range(3, 7) : this.rng.range(5, 9);
   }

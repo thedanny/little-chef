@@ -446,7 +446,8 @@ export class KitchenScreen {
         const v = this.custViews[d.slot];
         v.look = d.customer.look;
         this.setExpr(d.slot, 'idle');
-        v.el.classList.remove('out', 'leaving', 'calling');
+        v.el.classList.remove('out', 'leaving', 'calling', 'fidget', ...PULSES);
+        v.fidget = false;
         v.dish.classList.add('hidden');
         s.play('door', { vol: 0.7 });
         break;
@@ -912,6 +913,18 @@ export class KitchenScreen {
         v.wanted = want;
         if (want) v.want.innerHTML = foodIcon(want);
         v.want.classList.toggle('show', !!want);
+      }
+    }
+
+    // A customer who has waited a long time for cooking to start gets fidgety.
+    for (let i = 0; i < k.customers.length; i++) {
+      const c = k.customers[i];
+      const fidget = !!c && ((c.state === 'ordered' && c.patience < 18) || (c.state === 'waiting' && c.patience < 12));
+      const cv = this.custViews[i];
+      if (fidget !== cv.fidget) {
+        cv.fidget = fidget;
+        cv.el.classList.toggle('fidget', fidget);
+        if (fidget && c.state === 'ordered') this.setExpr(i, 'ok');
       }
     }
 

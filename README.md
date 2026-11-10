@@ -8,6 +8,16 @@ No reading is needed to play. Everything is pictures, animation and sound.
 
 It is a plain web app: no build step, no dependencies, no accounts, nothing leaves the device.
 
+![Classic counter view: a pancake ready to flip while two customers wait](docs/screenshots/kitchen-counter.jpeg)
+
+| Split kitchen (two dishes) | Chef's eye view |
+| --- | --- |
+| ![Split kitchen](docs/screenshots/kitchen-split.jpeg) | ![Chef's eye](docs/screenshots/kitchen-chefs-eye.jpeg) |
+
+| Pick your chef | Shop | Session summary | Parent Mode |
+| --- | --- | --- | --- |
+| ![Home](docs/screenshots/home.jpeg) | ![Shop](docs/screenshots/shop.jpeg) | ![Summary](docs/screenshots/summary.jpeg) | ![Parent Mode](docs/screenshots/parent.jpeg) |
+
 ## Run it
 
 ```bash
