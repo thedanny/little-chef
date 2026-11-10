@@ -1,0 +1,232 @@
+/* Little Chef – the kitchen (gameplay) */
+
+.kitchen { background: #fbe9c4; }
+.kitchen .layer > svg { width: 100%; height: 100%; }
+.kitchen.paused *, .kitchen.paused *::before, .kitchen.paused *::after { animation-play-state: paused !important; }
+
+.kitchen .abs { position: absolute; }
+.decor { pointer-events: none; }
+.clock-hand { transform-box: view-box; }
+.pet { pointer-events: none; }
+
+/* --------------------------------------------------------------- HUD */
+
+.hud { position: absolute; left: 0; top: 0; right: 0; height: 84px; z-index: 30; pointer-events: none; }
+.hud::before {
+  content: "";
+  position: absolute; inset: 0 0 6px 0;
+  background: linear-gradient(#fff8e6f2, #ffeec6e6);
+  border-bottom: 5px solid var(--ink);
+  box-shadow: 0 6px 0 rgba(74, 43, 23, .18);
+}
+.hud > * { position: absolute; pointer-events: auto; }
+.hud-pause { left: 14px; top: 9px; width: 58px; height: 58px; border-width: 4px; box-shadow: 0 5px 0 var(--ink); }
+.hud-stat { top: 12px; height: 56px; display: flex; align-items: center; gap: 8px; pointer-events: none; }
+.hud-stars { left: 100px; }
+.hud-coins { left: 272px; }
+.hud-ico { width: 52px; height: 52px; display: block; }
+.hud-mastery { left: 50%; top: 22px; transform: translateX(-50%); display: flex; gap: 7px; padding: 8px 14px; background: #fff; border: 4px solid var(--ink); border-radius: 30px; pointer-events: none; }
+.hud-mastery i { width: 22px; height: 22px; border-radius: 50%; border: 3.5px solid var(--ink); background: #efe5d3; }
+.hud-mastery i.ok { background: var(--yellow); }
+.hud-mastery i.no { background: #b9b2a6; }
+.hud-mastery i.last { animation: bounce .5s var(--pop); }
+.hud-mastery.locked { opacity: .45; }
+.hud-ring { right: 18px; top: 6px; width: 68px; height: 68px; border-radius: 50%; border: 5px solid var(--ink); background: #fff; pointer-events: none; }
+.hud-ring-pie { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(var(--green) calc(var(--p, 0) * 1turn), #f1e7d2 0); }
+.hud-ring-ico { position: absolute; inset: 9px; background: #fff; border-radius: 50%; border: 4px solid var(--ink); padding: 3px; }
+
+/* --------------------------------------------------------- customers */
+
+.customer { cursor: pointer; transition: transform 1s var(--pop), opacity .5s; transform-origin: 50% 100%; }
+.customer .cust-art { width: 100%; height: 100%; transform-origin: 50% 100%; }
+.layout-1 .customer.out, .layout-3 .customer.out { transform: translateY(108%); pointer-events: none; }
+.layout-2 .customer.out { transform: translateX(520px); opacity: 0; pointer-events: none; }
+.customer.leaving { transition: transform .9s ease-in, opacity .7s; }
+.customer.calling .cust-art { animation: cust-call .7s ease-in-out infinite; }
+@keyframes cust-call { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-12px) rotate(2deg); } }
+.customer.joy .cust-art { animation: cust-joy .5s ease-in-out 2; }
+@keyframes cust-joy { 0%, 100% { transform: translateY(0) scale(1); } 40% { transform: translateY(-24px) scale(1.04, .98); } 70% { transform: translateY(0) scale(.97, 1.04); } }
+.customer.shake .cust-art { animation: shake .45s 2; }
+.customer.bounce .cust-art { animation: bounce .5s var(--pop); }
+.customer.bounce, .customer.shake { animation: none; }
+
+.bubble {
+  z-index: 12; cursor: pointer;
+  background: #fff; border: 5px solid var(--ink); border-radius: 46% 46% 46% 46%;
+  box-shadow: 0 6px 0 rgba(74, 43, 23, .25);
+  transform-origin: 50% 100%;
+}
+.bubble::after {
+  content: ""; position: absolute; bottom: 14px; width: 30px; height: 30px; background: #fff;
+  border: 5px solid var(--ink); border-top: 0; border-right: 0; border-radius: 0 0 0 10px;
+}
+.bubble.tail-left::after { left: -14px; transform: rotate(28deg) skewX(8deg); }
+.bubble.tail-right::after { right: -14px; transform: scaleX(-1) rotate(28deg) skewX(8deg); }
+.bubble-food { position: absolute; inset: 11px; z-index: 1; }
+.bubble.cooking { opacity: .78; filter: saturate(.8); transform: scale(.82); transition: transform .3s, opacity .3s; }
+
+.jbubble {
+  z-index: 13; cursor: pointer; padding: 8px;
+  background: #fff7d6; border: 5px solid var(--ink); border-radius: 50%;
+  box-shadow: 0 5px 0 rgba(74, 43, 23, .25);
+  animation: wiggle .8s ease-in-out infinite;
+}
+@keyframes wiggle { 0%, 100% { transform: rotate(-6deg) scale(1); } 50% { transform: rotate(6deg) scale(1.08); } }
+
+.dish { pointer-events: none; }
+.dish.burnt svg, .burnt svg { filter: grayscale(1) brightness(.34) contrast(1.3); }
+.dish.dirty { pointer-events: auto; cursor: pointer; animation: wiggle 1s ease-in-out infinite; padding: 6px; }
+.table { pointer-events: none; }
+
+/* ------------------------------------------------------------- props */
+
+.prop { cursor: pointer; transform-origin: 50% 100%; }
+.prop .prop-art { width: 100%; height: 100%; }
+.prop .need {
+  position: absolute; left: 50%; top: -34px; width: 76px; height: 76px; margin-left: -38px; padding: 9px;
+  background: #fff; border: 5px solid var(--red); border-radius: 50%;
+  box-shadow: 0 5px 0 rgba(74, 43, 23, .25);
+  animation: need 0.7s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes need { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1.1); } }
+.sink.has-work .dirty-stack { animation: stack-wobble 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes stack-wobble { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+.jug { cursor: pointer; transform-origin: 50% 100%; }
+
+.spill { width: 140px; height: 84px; padding: 14px 10px; cursor: pointer; transform-origin: 50% 50%; }
+.spill .spill-art { width: 100%; height: 100%; transition: transform .2s var(--pop), opacity .2s; }
+.spill[data-hp="2"] .spill-art { transform: scale(.74); }
+.spill[data-hp="1"] .spill-art { transform: scale(.48); opacity: .85; }
+.cloth { width: 72px; height: 58px; pointer-events: none; }
+
+/* -------------------------------------------------------------- chef */
+
+.chef { pointer-events: none; transition: left .32s cubic-bezier(.3, 1.2, .5, 1), top .32s cubic-bezier(.3, 1.2, .5, 1); transform-origin: 50% 100%; }
+.chef.hop { animation: chef-hop .34s ease-out; }
+@keyframes chef-hop { 0% { transform: translateY(0) scale(1); } 40% { transform: translateY(-16px) scale(.97, 1.04); } 100% { transform: translateY(0) scale(1); } }
+.chef.look { animation: chef-look 1.5s ease-in-out; }
+@keyframes chef-look { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-8deg) translateX(-8px); } 50% { transform: rotate(8deg) translateX(8px); } 80% { transform: rotate(-4deg); } }
+.chef-paws { transition: left .25s ease-out; }
+
+/* ---------------------------------------------------------- stations */
+
+.station { cursor: pointer; transform-origin: 50% 100%; }
+.station .st-art { position: absolute; inset: 0; transform-origin: 50% 100%; }
+.station .st-glow {
+  position: absolute; inset: -4% -6% -2% -6%; border-radius: 40px; opacity: 0;
+  background: radial-gradient(closest-side, var(--glow, #ffe27a) 0%, transparent 100%);
+  transition: opacity .25s;
+}
+.layout-2 .station::before {
+  content: ""; position: absolute; left: 6%; right: 6%; bottom: -6px; height: 22px; border-radius: 50%; background: rgba(0, 0, 0, .12);
+}
+
+.station.bounce { animation: bounce .45s var(--pop); }
+.station.peek .st-art { animation: st-peek .5s ease-out; }
+@keyframes st-peek { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.05, .96); } }
+.station.act .food { animation: food-hop .45s ease-out; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes food-hop { 0%, 100% { transform: translateY(0) scale(1); } 40% { transform: translateY(-18px) scale(1.06, .95); } }
+.station.act-flip .food { animation: food-flip .6s ease-in-out; transform-box: fill-box; transform-origin: 50% 50%; }
+@keyframes food-flip { 0% { transform: translateY(0) scaleY(1); } 30% { transform: translateY(-46px) scaleY(.2); } 55% { transform: translateY(-52px) scaleY(-1); } 80% { transform: translateY(-20px) scaleY(.3); } 100% { transform: translateY(0) scaleY(1); } }
+
+/* Progress pie: always on at the loudest cue level, otherwise only when peeking. */
+.st-ring {
+  position: absolute; right: -4px; top: -10px; width: 74px; height: 74px; border-radius: 50%;
+  border: 5px solid var(--ink); background: #fff; box-shadow: 0 5px 0 rgba(74, 43, 23, .25);
+  transform: scale(0); transition: transform .2s var(--pop); z-index: 3; pointer-events: none;
+}
+.st-ring.show { transform: scale(1); }
+.st-ring-pie { position: absolute; inset: 5px; border-radius: 50%; background: conic-gradient(var(--green) calc(var(--p, 0) * 1turn), #f1e7d2 0); border: 3px solid var(--ink); }
+
+/* Action bubble: what to do next. */
+.st-bubble {
+  position: absolute; left: 50%; top: -52px; width: 104px; height: 104px; margin-left: -52px; padding: 13px;
+  background: #fff; border: 5px solid var(--ink); border-radius: 50%; box-shadow: 0 6px 0 rgba(74, 43, 23, .25);
+  transform: scale(0); transition: transform .22s var(--pop); z-index: 4; pointer-events: none;
+}
+.st-bubble.show { transform: scale(1); animation: bubble-bob .7s ease-in-out infinite; }
+@keyframes bubble-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -9px; } }
+
+/* Ingredient stock. */
+.st-stock { position: absolute; left: 2px; bottom: 4px; display: flex; align-items: center; gap: 4px; padding: 4px 8px 4px 4px; background: #fff; border: 4px solid var(--ink); border-radius: 22px; z-index: 2; pointer-events: none; transform-origin: 0 100%; }
+.st-stock .ing { width: 30px; height: 30px; display: block; }
+.st-stock i { width: 12px; height: 12px; border-radius: 50%; border: 3px solid var(--ink); background: #efe5d3; }
+.st-stock i.on { background: var(--green); }
+.st-stock.empty { border-color: var(--red); animation: need .7s ease-in-out infinite; }
+.st-stock.bounce { animation: bounce .5s var(--pop); }
+
+/* Smoke: how close the dish is to burning. */
+.st-smoke { position: absolute; left: 20%; right: 20%; top: -6%; height: 44%; pointer-events: none; z-index: 2; }
+.st-smoke i { position: absolute; bottom: 0; width: 34px; height: 34px; border-radius: 50%; background: #8d9199; border: 3px solid #4a4a52; opacity: 0; }
+.st-smoke i:nth-child(1) { left: 8%; }
+.st-smoke i:nth-child(2) { left: 36%; animation-delay: -.5s !important; }
+.st-smoke i:nth-child(3) { left: 62%; animation-delay: -1s !important; }
+.st-smoke i:nth-child(4) { left: 84%; animation-delay: -1.4s !important; }
+@keyframes smoke { 0% { transform: translateY(10px) scale(.3); opacity: 0; } 25% { opacity: var(--smoke-o, .8); } 100% { transform: translateY(-90px) scale(1.5); opacity: 0; } }
+.station[data-smoke="1"] .st-smoke i:nth-child(odd) { animation: smoke 2.2s ease-out infinite; --smoke-o: .45; width: 22px; height: 22px; }
+.station[data-smoke="2"] .st-smoke i { animation: smoke 1.6s ease-out infinite; --smoke-o: .8; }
+.station[data-smoke="3"] .st-smoke i { animation: smoke 1.3s ease-out infinite; --smoke-o: .95; background: #5c5c66; width: 44px; height: 44px; }
+
+/* Subtle cue: a few sparkles when a dish is ready. */
+.st-shimmer { position: absolute; left: 22%; right: 22%; top: 2%; height: 30%; pointer-events: none; opacity: 0; }
+.st-shimmer i { position: absolute; width: 12px; height: 12px; background: #fff; border: 2px solid var(--ink); transform: rotate(45deg) scale(0); border-radius: 3px; }
+.st-shimmer i:nth-child(1) { left: 10%; top: 50%; }
+.st-shimmer i:nth-child(2) { left: 48%; top: 10%; }
+.st-shimmer i:nth-child(3) { left: 84%; top: 46%; }
+@keyframes shimmer { 0%, 100% { transform: rotate(45deg) scale(0); } 50% { transform: rotate(45deg) scale(1); } }
+
+/* --- cue strength: loud (0) → clear (1) → subtle (2) → silent (3) --- */
+
+.kitchen[data-cue="0"] .station[data-phase="ready"] { animation: st-ready 0.6s ease-in-out infinite; }
+.kitchen[data-cue="0"] .station[data-phase="ready"] .st-glow { opacity: 1; animation: glow-pulse .6s ease-in-out infinite; }
+.kitchen[data-cue="1"] .station[data-phase="ready"] { animation: st-ready-soft 1.1s ease-in-out infinite; }
+.kitchen[data-cue="1"] .station[data-phase="ready"] .st-glow { opacity: .7; animation: glow-pulse 1.1s ease-in-out infinite; }
+.kitchen[data-cue="2"] .station[data-phase="ready"] .st-shimmer { opacity: 1; }
+.kitchen[data-cue="2"] .station[data-phase="ready"] .st-shimmer i { animation: shimmer 1.4s ease-in-out infinite; }
+.kitchen[data-cue="2"] .station[data-phase="ready"] .st-shimmer i:nth-child(2) { animation-delay: -.45s; }
+.kitchen[data-cue="2"] .station[data-phase="ready"] .st-shimmer i:nth-child(3) { animation-delay: -.9s; }
+
+.kitchen[data-cue="0"] .station[data-phase="late"],
+.kitchen[data-cue="1"] .station[data-phase="late"] { animation: st-late .28s linear infinite; }
+.kitchen[data-cue="0"] .station[data-phase="late"] .st-glow,
+.kitchen[data-cue="1"] .station[data-phase="late"] .st-glow { --glow: #ff6a55; opacity: 1; animation: glow-pulse .35s ease-in-out infinite; }
+.kitchen[data-cue="0"] .station[data-phase="late"] .st-bubble,
+.kitchen[data-cue="1"] .station[data-phase="late"] .st-bubble { border-color: var(--red); background: #fff0ed; }
+
+.station[data-phase="burnt"] .st-bubble { border-color: #6b6b74; background: #ecebf0; }
+.station[data-phase="quick"] .st-bubble { border-color: var(--green-dark); }
+
+@keyframes st-ready { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-14px) scale(1.04); } }
+@keyframes st-ready-soft { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes st-late { 0%, 100% { transform: translateX(0) rotate(0); } 25% { transform: translateX(-4px) rotate(-1deg); } 75% { transform: translateX(4px) rotate(1deg); } }
+@keyframes glow-pulse { 0%, 100% { transform: scale(.92); } 50% { transform: scale(1.08); } }
+
+/* ------------------------------------------------------- hand, overlays */
+
+.hand { position: absolute; width: 76px; height: 91px; z-index: 45; pointer-events: none; transform: rotate(180deg); animation: hand-bob .7s ease-in-out infinite; filter: drop-shadow(0 6px 0 rgba(74, 43, 23, .3)); }
+@keyframes hand-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 16px; } }
+
+.fx-layer { z-index: 50; }
+
+.overlay { position: absolute; inset: 0; z-index: 80; display: grid; place-items: center; }
+.overlay.pause-menu { background: rgba(43, 26, 16, .55); backdrop-filter: blur(3px); }
+.pause-card { display: grid; justify-items: center; gap: 30px; padding: 44px 60px; background: var(--paper); border: 6px solid var(--ink); border-radius: 48px; box-shadow: 0 12px 0 var(--ink); }
+.pause-play { width: 190px; height: 190px; border-width: 7px; box-shadow: 0 10px 0 var(--ink); }
+.pause-row { display: flex; gap: 22px; }
+.pause-row .btn { width: 92px; height: 92px; }
+.pause-music.off { filter: grayscale(1) brightness(.85); opacity: .6; }
+
+.levelup {
+  position: absolute; left: 50%; top: 50%; z-index: 70; width: 360px; height: 300px; margin: -170px 0 0 -180px;
+  display: grid; justify-items: center; align-content: center; gap: 6px; pointer-events: none;
+  animation: levelup 2.8s ease both;
+}
+.levelup::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(closest-side, #fff8d0 30%, #ffe27acc 60%, transparent 100%); animation: spin 6s linear infinite; }
+.levelup-hat { position: relative; width: 190px; height: 190px; filter: drop-shadow(0 8px 0 rgba(74, 43, 23, .3)); }
+.levelup-stars { position: relative; display: flex; gap: 8px; }
+.levelup-stars svg { width: 62px; height: 62px; animation: bounce .6s var(--pop) infinite; }
+.levelup-stars svg:nth-child(2) { animation-delay: .15s; width: 78px; height: 78px; }
+.levelup-stars svg:nth-child(3) { animation-delay: .3s; }
+@keyframes levelup { 0% { transform: scale(0) rotate(-20deg); opacity: 0; } 14% { transform: scale(1.15) rotate(4deg); opacity: 1; } 22% { transform: scale(1) rotate(0); } 82% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+@keyframes spin { to { transform: rotate(360deg); } }

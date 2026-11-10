@@ -1,0 +1,178 @@
+/* Little Chef – base, stage and shared UI */
+
+:root {
+  --ink: #4a2b17;
+  --cream: #fff4dc;
+  --paper: #fffaf0;
+  --wood: #d59a5b;
+  --red: #ef5b4c;
+  --orange: #ff9a3d;
+  --yellow: #ffd84a;
+  --green: #6cc35b;
+  --green-dark: #3f9a44;
+  --blue: #4d9de0;
+  --purple: #9b6fd6;
+  --pink: #ff8fb1;
+  --font: ui-rounded, "Arial Rounded MT Bold", "Nunito", "Baloo 2", "Segoe UI", system-ui, sans-serif;
+  --pop: cubic-bezier(.34, 1.56, .64, 1);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #2b1a10;
+  font-family: var(--font);
+  color: var(--ink);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 40%, #5a3a22, #24150c 75%);
+}
+
+/* The whole game is drawn on a 1280×800 stage and scaled to fit the screen. */
+.stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1280px;
+  height: 800px;
+  transform-origin: 50% 50%;
+  overflow: hidden;
+  background: var(--cream);
+  border-radius: 18px;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, .5);
+}
+
+.screen { position: absolute; inset: 0; overflow: hidden; }
+.screen.enter { animation: screen-in .35s ease both; }
+@keyframes screen-in { from { opacity: 0; transform: scale(1.03); } to { opacity: 1; transform: none; } }
+
+svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+.abs { position: absolute; }
+.layer { position: absolute; inset: 0; pointer-events: none; }
+.hidden { display: none !important; }
+
+/* ------------------------------------------------------------- buttons */
+
+button { font: inherit; color: inherit; border: 0; background: none; padding: 0; cursor: pointer; }
+
+.btn {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  border: 5px solid var(--ink);
+  border-radius: 26px;
+  background: var(--yellow);
+  box-shadow: 0 7px 0 var(--ink);
+  transition: transform .08s, box-shadow .08s, filter .15s;
+  cursor: pointer;
+}
+.btn:active, .btn.pressed { transform: translateY(5px); box-shadow: 0 2px 0 var(--ink); }
+.btn > svg { width: 62%; height: 62%; }
+.btn.round { border-radius: 50%; }
+.btn.green { background: var(--green); }
+.btn.red { background: var(--red); }
+.btn.blue { background: var(--blue); }
+.btn.cream { background: var(--paper); }
+.btn.purple { background: var(--purple); }
+.btn.orange { background: var(--orange); }
+.btn[disabled], .btn.disabled { filter: grayscale(.8) brightness(.95); opacity: .7; pointer-events: none; }
+.btn.small { border-width: 4px; box-shadow: 0 5px 0 var(--ink); border-radius: 18px; }
+.btn.text { padding: 10px 22px; font-weight: 800; font-size: 20px; border-radius: 18px; border-width: 4px; box-shadow: 0 5px 0 var(--ink); }
+
+.num {
+  font-weight: 900;
+  font-size: 34px;
+  letter-spacing: .5px;
+  color: #fff;
+  -webkit-text-stroke: 7px var(--ink);
+  paint-order: stroke fill;
+  line-height: 1;
+}
+
+.shake { animation: shake .4s; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-9px) rotate(-2deg); }
+  40% { transform: translateX(9px) rotate(2deg); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+.bounce { animation: bounce .5s var(--pop); }
+@keyframes bounce { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
+.pop-in { animation: pop-in .35s var(--pop) both; }
+@keyframes pop-in { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* ------------------------------------------------- shared art animation */
+
+@keyframes wisp { 0% { transform: translateY(8px) scaleY(.7); opacity: 0; } 30% { opacity: .9; } 100% { transform: translateY(-22px) scaleY(1.2); opacity: 0; } }
+.wisp { transform-box: fill-box; transform-origin: 50% 100%; animation: wisp 1.9s ease-in-out infinite; }
+.wisp.w1 { animation-delay: -.6s; }
+.wisp.w2 { animation-delay: -1.2s; }
+
+@keyframes flame { 0%, 100% { transform: scaleY(1) scaleX(1); } 50% { transform: scaleY(1.35) scaleX(.85); } }
+.flame { transform-box: fill-box; transform-origin: 50% 100%; animation: flame .32s ease-in-out infinite; }
+.flame.f1 { animation-delay: -.1s; }
+.flame.f2 { animation-delay: -.2s; }
+
+@keyframes bub { 0% { transform: translateY(4px) scale(.3); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-12px) scale(1.1); opacity: 0; } }
+.bub { transform-box: fill-box; transform-origin: center; animation: bub 1s ease-out infinite; }
+.bub.b1 { animation-delay: -.25s; }
+.bub.b2 { animation-delay: -.5s; }
+.bub.b3 { animation-delay: -.75s; }
+
+@keyframes spark { 0%, 100% { opacity: 0; transform: scale(.4); } 50% { opacity: 1; transform: scale(1); } }
+.spark { transform-box: fill-box; transform-origin: center; animation: spark .5s ease-in-out infinite; }
+.spark.s1 { animation-delay: -.17s; }
+.spark.s2 { animation-delay: -.33s; }
+
+@keyframes lamp { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.25); } }
+.lamp { animation: lamp .9s ease-in-out infinite; }
+
+@keyframes twinkle { 0%, 100% { transform: scale(.5) rotate(0); opacity: .3; } 50% { transform: scale(1.1) rotate(45deg); opacity: 1; } }
+.twinkle { transform-box: fill-box; transform-origin: center; animation: twinkle 1.6s ease-in-out infinite; }
+
+@keyframes wave { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(22deg); } }
+.arm.waving { transform-box: view-box; transform-origin: 148px 192px; animation: wave .5s ease-in-out infinite; }
+@keyframes cheer { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.arm.cheering { animation: cheer .35s ease-in-out infinite; }
+
+@keyframes chew { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(.25); } }
+.chew { transform-box: fill-box; transform-origin: center; animation: chew .32s ease-in-out infinite; }
+
+@keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.08); } }
+.eyes { transform-box: fill-box; transform-origin: center; animation: blink 4.2s infinite; }
+
+@keyframes tail { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(9deg); } }
+.tail { transform-box: fill-box; transform-origin: 0% 100%; animation: tail .8s ease-in-out infinite; }
+@keyframes flap { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-10deg); } }
+.wing { transform-box: fill-box; transform-origin: 50% 100%; animation: flap .7s ease-in-out infinite; }
+@keyframes puff { 0%, 60% { opacity: 0; transform: translateX(-6px) scale(.5); } 80% { opacity: .9; } 100% { opacity: 0; transform: translateX(10px) scale(1.2); } }
+.puff { transform-box: fill-box; transform-origin: center; animation: puff 3.4s ease-out infinite; }
+@keyframes swim { 0%, 100% { transform: translateX(-9px); } 50% { transform: translateX(9px) scaleX(-1); } }
+.fish { transform-box: fill-box; transform-origin: center; animation: swim 5s ease-in-out infinite; }
+@keyframes glow { 0%, 100% { filter: brightness(.85); } 50% { filter: brightness(1.3) drop-shadow(0 0 5px #fff8); } }
+.bulb { animation: glow 1.5s ease-in-out infinite; }
+.bulb.l1 { animation-delay: -.5s; }
+.bulb.l2 { animation-delay: -1s; }
+@keyframes water { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(.7); } }
+.water { transform-box: fill-box; transform-origin: center; animation: water .14s linear infinite; }
+@keyframes suds { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-4px) scale(1.08); } }
+.suds { transform-box: fill-box; transform-origin: center bottom; animation: suds .3s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wisp, .bub, .spark, .lamp, .twinkle, .eyes, .tail, .wing, .puff, .fish, .bulb { animation: none; }
+}

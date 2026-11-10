@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Little Chef – art gallery</title>
+<link rel="stylesheet" href="styles/main.css">
+<style>
+  body { background: #f3ead8; overflow: auto; height: auto; font-family: system-ui, sans-serif; padding: 16px; }
+  h2 { margin: 18px 0 8px; font-size: 16px; color: #4a2b17; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+  .cell { background: #fff8ea; border-radius: 12px; padding: 6px; text-align: center; font-size: 11px; color: #6b4a33; }
+  .cell svg { display: block; }
+</style>
+</head>
+<body>
+<div id="g"></div>
+<script type="module">
+import { foodIcon, actionIcon, ingredientIcon } from './src/ui/art/food.js';
+import { stationSvg } from './src/ui/art/stations.js';
+import { customerSvg, chefSvg, avatarSvg, SPECIES_IDS, animalInner } from './src/ui/art/animals.js';
+import { fridgeSvg, sinkSvg, jugSvg, spillSvg, handSvg, petSvg, clockSvg, decorSvg, icon, clothSvg } from './src/ui/art/props.js';
+import { windowSvg, tableSvg, pawsSvg } from './src/ui/art/scene.js';
+import { svg } from './src/ui/art/common.js';
+
+const g = document.getElementById('g');
+function section(title, items, w = 110) {
+  const h = document.createElement('h2'); h.textContent = title; g.append(h);
+  const row = document.createElement('div'); row.className = 'row'; g.append(row);
+  for (const [label, markup, width] of items) {
+    const c = document.createElement('div'); c.className = 'cell';
+    c.innerHTML = `<div style="width:${width || w}px">${markup}</div>${label}`;
+    row.append(c);
+  }
+}
+const params = new URLSearchParams(location.search);
+const only = params.get('only');
+const S = (name, fn) => { if (!only || only === name) fn(); };
+
+S('food', () => {
+  section('Food', ['pancakes', 'mac', 'toast', 'soup', 'grilled', 'fries', 'cookies', 'juice'].map((f) => [f, foodIcon(f)]));
+  section('Actions', ['flip', 'plate', 'drain', 'cheese', 'pop', 'butter', 'stir', 'ladle', 'lift', 'salt', 'takeout', 'sprinkle'].map((f) => [f, actionIcon(f)]), 90);
+  section('Ingredients', ['stove', 'griddle', 'toaster', 'fryer', 'oven'].map((f) => [f, ingredientIcon(f)]), 80);
+});
+S('stations', () => {
+  const states = [
+    ['stove', [{ mode: 'idle' }, { recipeId: 'mac', step: 0, mode: 'cook' }, { recipeId: 'mac', step: 1, mode: 'quick' }, { recipeId: 'soup', step: 0, mode: 'cook' }, { recipeId: 'soup', step: 1, mode: 'cook' }, { recipeId: 'mac', step: 0, mode: 'burnt' }]],
+    ['griddle', [{ mode: 'idle' }, { recipeId: 'pancakes', step: 0, mode: 'cook' }, { recipeId: 'pancakes', step: 1, mode: 'cook' }, { recipeId: 'pancakes', step: 0, mode: 'burnt' }, { recipeId: 'grilled', step: 0, mode: 'cook' }, { recipeId: 'grilled', step: 1, mode: 'cook' }]],
+    ['toaster', [{ mode: 'idle' }, { recipeId: 'toast', step: 0, mode: 'cook' }, { recipeId: 'toast', step: 1, mode: 'quick' }, { recipeId: 'toast', step: 0, mode: 'burnt' }]],
+    ['fryer', [{ mode: 'idle' }, { recipeId: 'fries', step: 0, mode: 'cook' }, { recipeId: 'fries', step: 1, mode: 'quick' }, { recipeId: 'fries', step: 0, mode: 'burnt' }]],
+    ['oven', [{ mode: 'idle' }, { recipeId: 'cookies', step: 0, mode: 'cook' }, { recipeId: 'cookies', step: 1, mode: 'quick' }, { recipeId: 'cookies', step: 0, mode: 'burnt' }]],
+  ];
+  for (const [id, list] of states) section(id, list.map((s) => [`${s.recipeId || ''} ${s.mode}`, stationSvg(id, { step: 0, ...s })]), 200);
+});
+S('animals', () => {
+  section('Species (idle)', SPECIES_IDS.map((s) => [s, svg('0 -40 200 272', animalInner(s, { expr: 'idle', look: 3 }))]), 120);
+  const exprs = ['idle', 'wave', 'happy', 'ok', 'grumpy', 'sad', 'eating', 'thirsty'];
+  for (const s of ['fox', 'frog', 'panda', 'owl', 'pig']) section(`${s} expressions`, exprs.map((e) => [e, svg('0 -40 200 272', animalInner(s, { expr: e, look: 5 }))]), 110);
+  section('Customers by seed', Array.from({ length: 12 }, (_, i) => [i * 137, customerSvg(i * 137, 'idle')]), 100);
+  section('Avatars', ['fox', 'bear', 'bunny', 'cat', 'frog', 'panda', 'pig', 'owl'].map((s) => [s, avatarSvg(s)]), 90);
+  section('Chef outfits', ['classic', 'bandana', 'bunny', 'crown', 'wizard', 'space'].map((o, i) => [o, chefSvg(['fox', 'bear', 'bunny', 'cat', 'frog', 'panda'][i], o, { arms: i % 2 ? 'up' : 'down', expr: i % 2 ? 'happy' : 'idle' })]), 110);
+});
+S('props', () => {
+  section('Props', [
+    ['fridge', fridgeSvg(false), 120], ['fridge open', fridgeSvg(true), 120],
+    ['sink', sinkSvg({ dirty: 2, clean: 3 }), 150], ['sink washing', sinkSvg({ dirty: 4, clean: 1, washing: true }), 150], ['sink empty', sinkSvg({ dirty: 0, clean: 5 }), 150],
+    ['jug', jugSvg(), 70], ['spill0', spillSvg(0), 110], ['spill1', spillSvg(1), 110], ['spill2', spillSvg(2), 110], ['cloth', clothSvg(), 70], ['hand', handSvg(), 70],
+    ['table', tableSvg(), 200], ['paws', pawsSvg(), 240],
+  ]);
+  section('Pets', ['cat', 'dog', 'rabbit', 'parrot', 'dragon'].map((p) => [p, petSvg(p)]), 110);
+  section('Decor', [['clock', clockSvg(), 80], ['window', windowSvg(), 160], ...['plant', 'picture', 'fishbowl'].map((d) => [d, decorSvg(d), 80]), ['bunting', decorSvg('bunting'), 400], ['lights', decorSvg('lights'), 400]]);
+  section('Icons', ['star', 'coin', 'play', 'pause', 'home', 'cart', 'gear', 'lock', 'back', 'check', 'plus', 'close', 'soundOn', 'soundOff', 'music', 'full', 'moon', 'sun', 'hat', 'paw', 'brush', 'frame', 'fork', 'trash', 'hourglass'].map((n) => [n, icon(n)]), 56);
+});
+</script>
+</body>
+</html>

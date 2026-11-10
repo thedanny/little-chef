@@ -333,12 +333,12 @@ test('closing time stops new customers and the kitchen empties', () => {
 test('suggest never points at a cooking station unless timed hints are allowed', () => {
   const { k } = make();
   greetFirst(k);
-  assert.deepEqual(k.suggest(), { type: 'station', id: 'toaster' });
+  assert.deepEqual(k.suggest(), { type: 'station', id: 'toaster', blocking: true });
   k.tapStation('toaster');
   runUntil(k, () => k.stations.toaster.phase === 'ready');
   const plain = k.suggest();
   assert.ok(!plain || !(plain.type === 'station' && plain.id === 'toaster'));
-  assert.deepEqual(k.suggest({ includeTimed: true }), { type: 'station', id: 'toaster' });
+  assert.deepEqual(k.suggest({ includeTimed: true }), { type: 'station', id: 'toaster', blocking: true });
 });
 
 test('a full simulated session with a diligent player earns mostly 3 stars', () => {

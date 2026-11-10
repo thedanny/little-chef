@@ -179,18 +179,20 @@ export class Kitchen {
    */
   suggest({ includeTimed = false } = {}) {
     const stations = this.stationList();
+    const must = (o) => ({ ...o, blocking: true });
+    const may = (o) => ({ ...o, blocking: false });
     if (includeTimed) {
       const urgent = stations.find((s) => s.phase === 'late') || stations.find((s) => s.phase === 'ready');
-      if (urgent) return { type: 'station', id: urgent.id };
+      if (urgent) return must({ type: 'station', id: urgent.id });
     }
     const burnt = stations.find((s) => s.phase === 'burnt');
-    if (burnt) return { type: 'station', id: burnt.id };
+    if (burnt) return must({ type: 'station', id: burnt.id });
     const quick = stations.find((s) => s.phase === 'quick');
-    if (quick) return { type: 'station', id: quick.id };
+    if (quick) return must({ type: 'station', id: quick.id });
     const juice = this.customers.find((c) => c && c.juice);
-    if (juice) return { type: 'customer', slot: juice.slot };
+    if (juice) return may({ type: 'customer', slot: juice.slot });
     const waiting = this.customers.find((c) => c && c.state === 'waiting');
-    if (waiting) return { type: 'customer', slot: waiting.slot };
+    if (waiting) return must({ type: 'customer', slot: waiting.slot });
     if (this.activeCount() < this.maxConcurrent()) {
       const ordered = this.customers
         .filter((c) => c && c.state === 'ordered')
@@ -198,16 +200,16 @@ export class Kitchen {
         .find((c) => this.stations[RECIPES[c.recipeId].station].phase === 'idle');
       if (ordered) {
         const st = this.stations[RECIPES[ordered.recipeId].station];
-        if (this.plates.clean <= 0) return { type: 'sink' };
-        if (st.stock <= 0) return { type: 'fridge' };
-        return { type: 'station', id: st.id };
+        if (this.plates.clean <= 0) return must({ type: 'sink' });
+        if (st.stock <= 0) return must({ type: 'fridge' });
+        return must({ type: 'station', id: st.id });
       }
     }
     const plateSlot = this.tablePlates.findIndex(Boolean);
-    if (plateSlot >= 0) return { type: 'plate', slot: plateSlot };
-    if (this.plates.dirty > 0 && this.sink.washing <= 0) return { type: 'sink' };
-    if (this.spills.length) return { type: 'spill', id: this.spills[0].id };
-    if (this.fridge.busy <= 0 && stations.some((s) => s.stock < TUNING.maxStock)) return { type: 'fridge' };
+    if (plateSlot >= 0) return may({ type: 'plate', slot: plateSlot });
+    if (this.plates.dirty > 0 && this.sink.washing <= 0) return may({ type: 'sink' });
+    if (this.spills.length) return may({ type: 'spill', id: this.spills[0].id });
+    if (this.fridge.busy <= 0 && stations.some((s) => s.stock < TUNING.maxStock)) return may({ type: 'fridge' });
     return null;
   }
 
@@ -767,6 +769,8 @@ export class Kitchen {
       this.spaced = true;
       this.session.spaceOuts++;
       for (const st of this.stationList()) if (COOKING_PHASES.has(st.phase)) st.spacedOut = true;
+      // Tuning: bring the next bit of busywork forward to pull attention back.
+      this.spillTimer = Math.min(this.spillTimer, 2);
       this.emit('spaceout', {});
     }
   }
