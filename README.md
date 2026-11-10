@@ -8,6 +8,9 @@ No reading is needed to play. Everything is pictures, animation and sound.
 
 It is a plain web app: no build step, no dependencies, no accounts, nothing leaves the device.
 
+**Play it: <https://thedanny.github.io/little-chef/>** (tablet in landscape; use "Add to Home
+Screen" for full screen).
+
 ![Classic counter view: a pancake ready to flip while two customers wait](docs/screenshots/kitchen-counter.jpeg)
 
 | Split kitchen (two dishes) | Chef's eye view |
@@ -26,10 +29,10 @@ npm start
 
 Then open <http://localhost:5173> (best on a tablet in landscape, or any desktop browser).
 
-Any static file server works too – the game is just `index.html` plus ES modules. To put it
-on a tablet, host the folder anywhere static (for example GitHub Pages: *Settings → Pages →
-Deploy from branch → main / root*) and use "Add to Home Screen". Once opened online it also
-works offline.
+Any static file server works too – the game is just `index.html` plus ES modules. The hosted
+copy above is GitHub Pages serving `main` from the repo root, so every push to `main` updates
+it. Once opened online it also works offline. Progress is saved per device and per address, so
+chefs made on `localhost` do not appear on the hosted copy.
 
 ```bash
 npm test
