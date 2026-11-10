@@ -228,7 +228,7 @@ test('there is always busywork available while a dish waits', () => {
   k.tapStation('toaster');
   k.spawnTimer = 999;
   k.spillTimer = 999;
-  run(k, 3, { keepBusy: true });
+  run(k, 5, { keepBusy: true });
   assert.ok(k.availableBusywork().length > 0);
 });
 

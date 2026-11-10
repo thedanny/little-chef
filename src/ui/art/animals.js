@@ -23,8 +23,9 @@ export const SPECIES = {
 export const SPECIES_IDS = Object.keys(SPECIES);
 const SHIRTS = ['#4d9de0', '#ef5b4c', '#6cc35b', '#9b6fd6', '#ff9a3d', '#3fb8af', '#ff8fb1', '#f2c230'];
 
-function ears(sp) {
+function ears(sp, low = false) {
   const f = sp.earFill || sp.fur;
+  if (low) return '';
   switch (sp.ears) {
     case 'pointy':
       return `<path d="M44 78 l-6 -60 l48 28z" fill="${f}" ${ink(5)}/><path d="M156 78 l6 -60 l-48 28z" fill="${f}" ${ink(5)}/>
@@ -51,10 +52,11 @@ function ears(sp) {
   }
 }
 
-function eyePair(sp, expr) {
-  const frog = sp.ears === 'frog';
+function eyePair(sp, expr, low = false) {
+  // `low`: a frog wearing a hat keeps its eyes on its face instead of on top.
+  const frog = sp.ears === 'frog' && !low;
   const ex = frog ? [66, 134] : [76, 124];
-  const ey = frog ? 54 : 96;
+  const ey = frog ? 54 : low ? 90 : 96;
   const white = frog || sp.discs;
   let out = '';
   if (sp.patches) {
@@ -65,6 +67,8 @@ function eyePair(sp, expr) {
   }
   if (frog) {
     out += `<circle cx="66" cy="54" r="15" fill="#fff" ${ink(3)}/><circle cx="134" cy="54" r="15" fill="#fff" ${ink(3)}/>`;
+  } else if (low) {
+    out += `<circle cx="76" cy="90" r="17" fill="#fff" ${ink(3)}/><circle cx="124" cy="90" r="17" fill="#fff" ${ink(3)}/>`;
   }
   const pupil = sp.patches ? '#fff' : INK;
   const glint = sp.patches ? INK : '#fff';
@@ -105,7 +109,7 @@ function eyePair(sp, expr) {
   return `${out}<g class="eyes">${eyes}</g>`;
 }
 
-function snoutAndMouth(sp, expr) {
+function snoutAndMouth(sp, expr, low = false) {
   let out = '';
   const frog = sp.ears === 'frog';
   let my = 128; // mouth baseline
@@ -121,8 +125,9 @@ function snoutAndMouth(sp, expr) {
     out += `<ellipse cx="100" cy="110" rx="14" ry="18" fill="#3a3a40" ${ink(3)}/><ellipse cx="96" cy="103" rx="4" ry="5" fill="#fff" opacity=".5"/>`;
     my = 138;
   } else if (frog) {
-    out += `<circle cx="92" cy="96" r="2.5" fill="${INK}"/><circle cx="108" cy="96" r="2.5" fill="${INK}"/>`;
-    my = 118;
+    const ny = low ? 112 : 96;
+    out += `<circle cx="92" cy="${ny}" r="2.5" fill="${INK}"/><circle cx="108" cy="${ny}" r="2.5" fill="${INK}"/>`;
+    my = low ? 128 : 118;
   } else if (sp.nose) {
     out += `<path d="M90 106 q10 -6 20 0 q-2 10 -10 11 q-8 -1 -10 -11z" fill="${sp.nose}" ${ink(2.5)}/>`;
     my = 128;
@@ -253,6 +258,7 @@ export function animalInner(speciesId, o = {}) {
   const fit = OUTFITS[o.outfit] || OUTFITS.classic;
   const shirt = chef ? fit.jacket : SHIRTS[Math.floor(seeded(look, 1) * SHIRTS.length)];
   const arms = o.arms || (expr === 'wave' ? 'wave' : 'down');
+  const low = chef && sp.ears === 'frog';
 
   let body = '';
   if (!o.headOnly) {
@@ -278,11 +284,11 @@ export function animalInner(speciesId, o = {}) {
   const stripes = sp.stripes ? `<g stroke="${sp.stripes}" stroke-width="6" stroke-linecap="round"><path d="M100 46 v14"/><path d="M84 50 l3 12"/><path d="M116 50 l-3 12"/></g>` : '';
   const spot = sp.spot ? `<path d="M118 60 q26 -6 36 20 q-4 22 -22 26 q-20 -16 -14 -46z" fill="${sp.spot}" opacity=".9"/>` : '';
   const head = `<g class="head">
-      ${ears(sp)}
+      ${ears(sp, low)}
       <ellipse cx="100" cy="100" rx="66" ry="60" fill="${sp.fur}" ${ink(5)}/>
       ${spot}${stripes}
-      ${snoutAndMouth(sp, expr)}
-      ${eyePair(sp, expr)}
+      ${snoutAndMouth(sp, expr, low)}
+      ${eyePair(sp, expr, low)}
       ${blush(expr)}
       ${!chef && !o.headOnly ? accessory(look, sp) : ''}
       ${chef ? hat(o.outfit) + helmet(o.outfit) : ''}

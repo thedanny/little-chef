@@ -49,7 +49,7 @@
   background: #fff; border: 6px solid var(--ink); border-radius: 34px; outline: none; -webkit-user-select: text; user-select: text;
 }
 .name-input::placeholder { color: #d9c9ae; }
-.ok-btn { width: 136px; height: 136px; border-width: 6px; box-shadow: 0 9px 0 var(--ink); }
+.ok-btn { flex: none; width: 136px; height: 136px; border-width: 6px; box-shadow: 0 9px 0 var(--ink); }
 
 /* ----------------------------------------------------------------- hub */
 
@@ -70,8 +70,7 @@
 .hub .play-btn.green { animation: play-pulse 1.5s ease-in-out infinite; }
 @keyframes play-pulse { 0%, 100% { scale: 1; } 50% { scale: 1.05; } }
 .goal-done { position: absolute; right: 6px; top: 6px; width: 96px; height: 96px; padding: 14px; background: #fff; border: 6px solid var(--ink); border-radius: 50%; animation: bounce .6s var(--pop); }
-.shop-btn { position: absolute; left: 1100px; top: 596px; width: 140px; height: 140px; border-width: 6px; box-shadow: 0 9px 0 var(--ink); }
-.hub .shop-btn { left: 852px; top: 618px; }
+.hub .shop-btn { position: absolute; left: 852px; top: 618px; width: 140px; height: 140px; border-width: 6px; box-shadow: 0 9px 0 var(--ink); }
 .zzz { position: absolute; left: 62%; top: 4%; font-weight: 900; color: #fff; -webkit-text-stroke: 6px var(--ink); paint-order: stroke fill; }
 .zzz b { position: absolute; font-size: 50px; opacity: 0; animation: zzz 3s ease-in-out infinite; }
 .zzz b:nth-child(2) { animation-delay: 1s; }

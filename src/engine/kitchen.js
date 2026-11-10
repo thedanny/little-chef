@@ -160,13 +160,14 @@ export class Kitchen {
     return RECIPES[st.recipeId].steps[st.step]?.action ?? null;
   }
 
-  /** Busywork that is available right now (used to keep the player busy). */
+  /** Clearly visible busywork available right now (used to keep the player busy). */
   availableBusywork() {
     const out = [];
     if (this.customers.some((c) => c && c.state === 'waiting')) out.push('greet');
     if (this.plates.dirty > 0) out.push('wash');
     if (this.spills.length) out.push('spill');
-    if (this.stationList().some((s) => s.stock < TUNING.maxStock)) out.push('restock');
+    // A nearly-full shelf is not an obvious job, so it does not count here.
+    if (this.stationList().some((s) => s.stock <= 1)) out.push('restock');
     if (this.customers.some((c) => c && c.juice)) out.push('juice');
     if (this.tablePlates.some(Boolean)) out.push('collect');
     return out;
@@ -732,7 +733,7 @@ export class Kitchen {
       const waiting = this.stationList().some((s) => s.phase === 'wait');
       if (waiting && this.availableBusywork().length === 0 && this.sink.washing <= 0 && this.fridge.busy <= 0) {
         this.noWorkFor += dt;
-        if (this.noWorkFor > 2) {
+        if (this.noWorkFor > 4) {
           this.spawnSpill();
           this.noWorkFor = 0;
         }

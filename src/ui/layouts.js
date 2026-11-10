@@ -21,6 +21,7 @@ const layout1 = {
   id: 1,
   scene: 'scene1',
   collectPlates: false,
+  customerClip: 430, // customers pop up from behind the counter
   customers: [
     { x: 305, y: 150, w: 190, h: 258 },
     { x: 785, y: 150, w: 190, h: 258 },
@@ -78,42 +79,42 @@ const layout2 = {
   scene: 'scene2',
   collectPlates: true,
   customers: [
-    { x: 716, y: 148, w: 176, h: 239 },
-    { x: 1034, y: 148, w: 176, h: 239 },
+    { x: 716, y: 190, w: 176, h: 239 },
+    { x: 1034, y: 190, w: 176, h: 239 },
   ],
   bubbles: [
-    { x: 866, y: 96, size: 126, tail: 'left' },
-    { x: 1150, y: 96, size: 126, tail: 'left' },
+    { x: 876, y: 92, size: 120, tail: 'left' },
+    { x: 1156, y: 92, size: 120, tail: 'left' },
   ],
   juiceBubbles: [
-    { x: 668, y: 220, size: 80 },
-    { x: 986, y: 220, size: 80 },
+    { x: 664, y: 250, size: 80 },
+    { x: 1196, y: 250, size: 80 },
   ],
   dishes: [
-    { x: 752, y: 316, size: 104 },
-    { x: 1070, y: 316, size: 104 },
+    { x: 752, y: 358, size: 104 },
+    { x: 1070, y: 358, size: 104 },
   ],
   tables: [
-    { x: 674, y: 366, w: 260, h: 150 },
-    { x: 992, y: 366, w: 260, h: 150 },
+    { x: 674, y: 408, w: 260, h: 150 },
+    { x: 992, y: 408, w: 260, h: 150 },
   ],
   stations: stations2,
-  fridge: { x: 676, y: 540, w: 150, h: 260 },
-  sink: { x: 1078, y: 546, w: 196, h: 252 },
-  juice: { x: 880, y: 640, w: 74, h: 89 },
-  pet: { x: 962, y: 676, w: 112, h: 112 },
+  fridge: { x: 676, y: 548, w: 145, h: 252 },
+  sink: { x: 1078, y: 552, w: 196, h: 252 },
+  juice: { x: 880, y: 650, w: 74, h: 89 },
+  pet: { x: 962, y: 680, w: 112, h: 112 },
   spills: [
-    { x: 716, y: 398 }, { x: 890, y: 398 }, { x: 1034, y: 398 }, { x: 1208, y: 398 },
+    { x: 716, y: 440 }, { x: 892, y: 440 }, { x: 1034, y: 440 }, { x: 1210, y: 440 },
   ],
   chef: { mode: 'free', w: 124, h: 223, homeX: 600, homeY: 420, laneX: 598, z: 6 },
   decor: {
-    window: { x: 878, y: 190, w: 150, h: 135 },
-    clock: { x: 676, y: 98, w: 70, h: 70 },
-    picture: { x: 944, y: 96, w: 96, h: 84 },
+    window: { x: 668, y: 98, w: 136, h: 122 },
+    clock: { x: 1040, y: 100, w: 72, h: 72 },
+    picture: { x: 915, y: 236, w: 96, h: 84 },
     plant: { x: 836, y: 690, w: 0, h: 0 },
-    fishbowl: { x: 884, y: 584, w: 64, h: 64 },
-    bunting: { x: 664, y: 84, w: 612, h: 50 },
-    lights: { x: 664, y: 84, w: 612, h: 44 },
+    fishbowl: { x: 884, y: 590, w: 64, h: 64 },
+    bunting: { x: 664, y: 84, w: 612, h: 44 },
+    lights: { x: 664, y: 84, w: 612, h: 40 },
   },
   z: { customers: 2, counter: 3, counterItems: 4, props: 4, pet: 5, chef: 6, worktop: 3, stations: 4 },
 };
@@ -122,6 +123,7 @@ const layout3 = {
   id: 3,
   scene: 'scene3',
   collectPlates: false,
+  customerClip: 360, // customers pop up behind the serving hatch
   customers: [
     { x: 380, y: 96, w: 180, h: 245 },
     { x: 720, y: 96, w: 180, h: 245 },
@@ -138,7 +140,7 @@ const layout3 = {
     { x: 418, y: 262, size: 104 },
     { x: 758, y: 262, size: 104 },
   ],
-  stations: (n) => row(n, { left: 214, right: 1066, bottom: 704, maxW: 300 }),
+  stations: (n) => row(n, { left: 222, right: 1074, bottom: 690, maxW: 252 }),
   fridge: { x: 1092, y: 372, w: 172, h: 299 },
   sink: { x: 8, y: 404, w: 204, h: 262 },
   juice: { x: 608, y: 260, w: 64, h: 77 },
@@ -146,7 +148,7 @@ const layout3 = {
   spills: [
     { x: 300, y: 342 }, { x: 600, y: 344 }, { x: 680, y: 344 }, { x: 980, y: 342 },
   ],
-  chef: { mode: 'paws', y: 668, w: 420, h: 130, minX: 220, maxX: 640, homeX: 430, z: 9 },
+  chef: { mode: 'paws', y: 706, w: 400, h: 124, minX: 226, maxX: 654, homeX: 440, z: 9 },
   decor: {
     window: { x: 0, y: 0, w: 0, h: 0 },
     clock: { x: 84, y: 110, w: 84, h: 84 },

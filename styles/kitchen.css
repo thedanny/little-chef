@@ -2,7 +2,9 @@
 
 .kitchen { background: #fbe9c4; }
 .kitchen .layer > svg { width: 100%; height: 100%; }
-.kitchen.paused *, .kitchen.paused *::before, .kitchen.paused *::after { animation-play-state: paused !important; }
+.kitchen.paused > :not(.overlay), .kitchen.paused > :not(.overlay) *, .kitchen.paused > :not(.overlay) *::before, .kitchen.paused > :not(.overlay) *::after { animation-play-state: paused !important; }
+.cust-clip { position: absolute; left: 0; top: 0; width: 1280px; overflow: hidden; pointer-events: none; }
+.cust-clip > * { pointer-events: auto; }
 
 .kitchen .abs { position: absolute; }
 .decor { pointer-events: none; }

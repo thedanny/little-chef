@@ -179,9 +179,14 @@ export class KitchenScreen {
 
   buildCustomers() {
     const L = this.layout;
+    // Customers live in a clipped layer so they can slide away behind the counter.
+    const clip = el('div', 'cust-clip');
+    clip.style.height = `${L.customerClip || 800}px`;
+    clip.style.zIndex = L.z.customers;
+    this.root.append(clip);
     for (let i = 0; i < 2; i++) {
       const node = el('div', 'abs customer out', '<div class="cust-art"></div>');
-      this.root.append(this.place(node, L.customers[i], L.z.customers));
+      clip.append(this.place(node, L.customers[i]));
       const bubble = el('div', `abs bubble tail-${L.bubbles[i].tail} hidden`, '<div class="bubble-food"></div>');
       this.root.append(this.place(bubble, L.bubbles[i], 12));
       const jb = el('div', 'abs jbubble hidden', foodIcon('juice'));
@@ -474,7 +479,7 @@ export class KitchenScreen {
         const p = center(v.rect);
         s.play('burnt');
         this.fx.puff(p.x, p.y - 40, { color: '#5c5c66', count: 9 });
-        this.setChef('sad', 'down', 1.6);
+        this.setChef('ok', 'down', 1.6);
         break;
       }
       case 'abandoned': {
@@ -674,7 +679,7 @@ export class KitchenScreen {
       if (d.busyBee) this.fx.burst(to.x, to.y, { count: 8, colors: [C.yellow, C.orange], spread: 90 });
       this.payCoins(d.coins, to, 0.3);
       if (d.stars === 3) this.setChef('happy', 'up', 1.6);
-      else if (d.stars === 1) this.setChef('sad', 'down', 1.6);
+      else if (d.stars === 1) this.setChef('ok', 'down', 1.6);
     });
     this.after(0.9, () => s.play(d.stars === 3 ? 'happy' : d.stars === 2 ? 'ok' : 'grumpy', { vol: 0.8 }));
     this.after(2.0, () => {
@@ -989,7 +994,7 @@ export class KitchenScreen {
       if (!this.handHold) this.hand.classList.add('hidden');
       return;
     }
-    this.showHand(this.rectOf(s), true);
+    this.showHand(this.rectOf(s), true, s.type === 'station');
   }
 
   rectOf(s) {
@@ -1008,10 +1013,11 @@ export class KitchenScreen {
     }
   }
 
-  showHand(r, live = false) {
+  showHand(r, live = false, beside = false) {
     const w = r.w ?? r.size;
-    const x = r.x + w / 2 - 38;
-    const y = Math.max(70, r.y - 60);
+    // Beside a station the hand sits to one side so it never hides the action bubble.
+    const x = beside ? r.x + w * 0.8 - 38 : r.x + w / 2 - 38;
+    const y = beside ? r.y - 6 : Math.max(70, r.y - 60);
     this.hand.style.left = `${x}px`;
     this.hand.style.top = `${y}px`;
     this.hand.classList.remove('hidden');

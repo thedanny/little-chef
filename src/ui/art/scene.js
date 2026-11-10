@@ -118,6 +118,10 @@ export function scene2(theme, stationRects = []) {
     ${checkerFloor(split - 104, 84, 104, STAGE_H - 84, '#f6e3c2', '#eccf9f', 52)}
     <path d="M${split - 104} 84 v${STAGE_H}" stroke="#d9c29b" stroke-width="4"/>
     ${slabs}
+    <ellipse cx="917" cy="792" rx="62" ry="7" fill="#000" opacity=".12"/>
+    <path d="M880 742 l-8 48 M954 742 l8 48" stroke="${INK}" stroke-width="12" stroke-linecap="round"/>
+    <path d="M880 742 l-8 48 M954 742 l8 48" stroke="${C.woodDark}" stroke-width="6" stroke-linecap="round"/>
+    <rect x="858" y="730" width="118" height="18" rx="8" fill="${C.wood}" ${ink(5)}/>
     <rect x="${split - 12}" y="0" width="24" height="${STAGE_H}" fill="${t.panel}" ${ink(5)}/>
     <rect x="${split - 20}" y="84" width="40" height="26" rx="8" fill="${t.trim}" ${ink(4)}/>`);
   return { wall };
@@ -163,9 +167,12 @@ export function scene3(theme) {
 /** The chef's two paws at the bottom of the chef's-eye view. */
 export function pawsSvg(fur = '#f28b3a', sleeve = '#ffffff') {
   const paw = (x, flip) => `<g transform="translate(${x} 0) scale(${flip ? -1 : 1} 1)">
-      <path d="M-46 130 q-6 -70 30 -84 q40 -10 52 30 l-4 54z" fill="${sleeve}" ${ink(5)}/>
-      <path d="M-34 60 q-10 -40 18 -52 q34 -10 44 22 q6 26 -10 40 q-30 14 -52 -10z" fill="${fur}" ${ink(5)}/>
-      <path d="M-10 16 v16 M8 12 v18" ${ink(4)}/>
+      <path d="M-44 136 q-4 -62 6 -84 h62 q12 24 8 84z" fill="${sleeve}" ${ink(5)}/>
+      <path d="M-40 62 h70" stroke="#d7dde3" stroke-width="5" stroke-linecap="round"/>
+      <g fill="${fur}" ${ink(5)}>
+        <ellipse cx="-24" cy="26" rx="13" ry="16"/><ellipse cx="-4" cy="16" rx="13" ry="17"/><ellipse cx="17" cy="24" rx="13" ry="16"/>
+        <path d="M-40 54 q-4 -30 36 -30 q38 0 36 30 q-4 12 -36 12 q-32 0 -36 -12z"/>
+      </g>
     </g>`;
   return svg('0 0 420 130', `${paw(80, false)}${paw(340, true)}`);
 }
