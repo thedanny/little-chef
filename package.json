@@ -1,0 +1,12 @@
+{
+  "name": "little-chef",
+  "version": "0.1.0",
+  "description": "Little Chef – a picture-only kitchen game that trains sustained attention and prospective memory for kids.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test"
+  },
+  "license": "MIT"
+}
