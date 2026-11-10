@@ -24,7 +24,14 @@ export class Sound {
       this.ctx = new AC();
       this.master = this.ctx.createGain();
       this.master.gain.value = this.enabled ? 0.9 : 0;
-      this.master.connect(this.ctx.destination);
+      // A gentle limiter so several sounds at once (stars + coins + a jingle) never clip.
+      const limiter = this.ctx.createDynamicsCompressor();
+      limiter.threshold.value = -14;
+      limiter.knee.value = 12;
+      limiter.ratio.value = 6;
+      limiter.attack.value = 0.004;
+      limiter.release.value = 0.18;
+      this.master.connect(limiter).connect(this.ctx.destination);
       this.sfx = this.ctx.createGain();
       this.sfx.connect(this.master);
       this.musicGain = this.ctx.createGain();
@@ -247,7 +254,7 @@ export class Sound {
         for (let i = 0; i < 4; i++) this.tone({ f: 320 + Math.random() * 200, to: 120, dur: 0.12, vol: 0.16 * v, at: i * 0.07 });
         this.noise({ f: 1400, dur: 0.25, vol: 0.1 * v, type: 'lowpass' });
         break;
-      case 'insert': this.tone({ f: 120, to: 80, dur: 0.1, vol: 0.3 * v, type: 'square' }); this.noise({ f: 2500, dur: 0.05, vol: 0.14 * v, at: 0.08 }); break;
+      case 'insert': this.tone({ f: 120, to: 80, dur: 0.1, vol: 0.16 * v, type: 'square' }); this.noise({ f: 2500, dur: 0.05, vol: 0.14 * v, at: 0.08 }); break;
       case 'drop': this.noise({ f: 5000, dur: 0.6, vol: 0.2 * v, q: 0.6 }); this.tone({ f: 500, dur: 0.05, vol: 0.1 * v, type: 'square' }); break;
       case 'tray': this.tone({ f: 130, to: 90, dur: 0.16, vol: 0.28 * v }); this.tone({ f: 1320, dur: 0.1, vol: 0.1 * v, at: 0.2, type: 'square' }); break;
       case 'flip':

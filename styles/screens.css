@@ -36,6 +36,7 @@
 .pcard.add .pcard-art { background: none; display: grid; place-items: center; }
 .pcard.add .pcard-art svg { width: 96px; height: 96px; }
 .pcard.add .pcard-art.plus svg path:last-child { stroke: var(--green); }
+.pcard.add:only-child { animation: play-pulse 1.4s ease-in-out infinite; }
 
 /* -------------------------------------------------------------- create */
 

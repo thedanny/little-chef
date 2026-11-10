@@ -57,6 +57,10 @@ runs the engine tests (Node's built-in test runner, no install needed).
 | A step missed – the dish burns but is still served | 1 | "bleh!" (funny, not punishing) |
 | Burnt dish left alone, or order never started | 0 | leaves sad |
 
+Dishes pay coins by their stars. Each chore pays a coin too while an order is on the go, and
+a perfect dish cooked while also getting chores done earns a small "busy bee" bonus – so the
+best strategy is exactly the skill being trained: stay busy *and* come back in time.
+
 Coins buy new recipes (soup, grilled cheese, fries, cookies – two of them bring a new
 station), chef outfits, pets, wall colours and decorations.
 
