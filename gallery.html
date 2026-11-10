@@ -58,6 +58,7 @@ S('animals', () => {
   for (const s of ['fox', 'frog', 'panda', 'owl', 'pig']) section(`${s} expressions`, exprs.map((e) => [e, svg('0 -40 200 272', animalInner(s, { expr: e, look: 5 }))]), 110);
   section('Customers by seed', Array.from({ length: 12 }, (_, i) => [i * 137, customerSvg(i * 137, 'idle')]), 100);
   section('Avatars', ['fox', 'bear', 'bunny', 'cat', 'frog', 'panda', 'pig', 'owl'].map((s) => [s, avatarSvg(s)]), 90);
+  section('Every chef (classic hat)', ['fox', 'bear', 'bunny', 'cat', 'frog', 'panda', 'pig', 'owl'].map((sp) => [sp, chefSvg(sp, 'classic', { expr: 'idle' })]), 110);
   section('Chef outfits', ['classic', 'bandana', 'bunny', 'crown', 'wizard', 'space'].map((o, i) => [o, chefSvg(['fox', 'bear', 'bunny', 'cat', 'frog', 'panda'][i], o, { arms: i % 2 ? 'up' : 'down', expr: i % 2 ? 'happy' : 'idle' })]), 110);
 });
 S('props', () => {

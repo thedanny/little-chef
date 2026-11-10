@@ -23,9 +23,14 @@ export const SPECIES = {
 export const SPECIES_IDS = Object.keys(SPECIES);
 const SHIRTS = ['#4d9de0', '#ef5b4c', '#6cc35b', '#9b6fd6', '#ff9a3d', '#3fb8af', '#ff8fb1', '#f2c230'];
 
-function ears(sp, low = false) {
+function ears(sp, low = false, hatted = false) {
   const f = sp.earFill || sp.fur;
   if (low) return '';
+  if (hatted && sp.ears === 'long') {
+    // Under a hat, long ears flop down the sides (a lop-eared bunny) so they stay visible.
+    return `<path d="M46 58 q-40 -4 -34 66 q22 14 36 -22z" fill="${f}" ${ink(5)}/><path d="M154 58 q40 -4 34 66 q-22 14 -36 -22z" fill="${f}" ${ink(5)}/>
+      <path d="M36 72 q-16 14 -12 42 q10 2 16 -14z" fill="${sp.inner}"/><path d="M164 72 q16 14 12 42 q-10 2 -16 -14z" fill="${sp.inner}"/>`;
+  }
   switch (sp.ears) {
     case 'pointy':
       return `<path d="M44 78 l-6 -60 l48 28z" fill="${f}" ${ink(5)}/><path d="M156 78 l6 -60 l-48 28z" fill="${f}" ${ink(5)}/>
@@ -284,7 +289,7 @@ export function animalInner(speciesId, o = {}) {
   const stripes = sp.stripes ? `<g stroke="${sp.stripes}" stroke-width="6" stroke-linecap="round"><path d="M100 46 v14"/><path d="M84 50 l3 12"/><path d="M116 50 l-3 12"/></g>` : '';
   const spot = sp.spot ? `<path d="M118 60 q26 -6 36 20 q-4 22 -22 26 q-20 -16 -14 -46z" fill="${sp.spot}" opacity=".9"/>` : '';
   const head = `<g class="head">
-      ${ears(sp, low)}
+      ${ears(sp, low, chef)}
       <ellipse cx="100" cy="100" rx="66" ry="60" fill="${sp.fur}" ${ink(5)}/>
       ${spot}${stripes}
       ${snoutAndMouth(sp, expr, low)}
