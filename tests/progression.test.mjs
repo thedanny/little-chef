@@ -274,3 +274,46 @@ test('game clock pauses when backgrounded and never jumps', () => {
   assert.ok(total < 0.25);
   clock.stop();
 });
+
+test('an interrupted session is committed on the next start', async () => {
+  const { commitPending, addPlayTime, MIN_SESSION_SEC } = await import('../src/engine/stats.js');
+  const p = createProfile({ name: 'Kid' });
+  const date = new Date(2026, 0, 5, 16, 0);
+  // Long enough (or with orders): becomes a real session record.
+  p.pending = summarizeSession({ orders: [{ stars: 3, rt: 1 }], spaceOuts: 0, peeks: 0, busywork: 2, missedCustomers: 0, cookingTime: 30, stars: 3, coins: 6 },
+    { durationSec: 95, levelStart: 0, levelEnd: 0, date });
+  assert.equal(commitPending(p), true);
+  assert.equal(p.pending, null);
+  assert.equal(p.stats.sessions.length, 1);
+  assert.equal(p.days[dayKey(date)].playedSec, 95);
+  assert.equal(commitPending(p), false);
+  // A few seconds with no orders: only the play time counts.
+  p.pending = summarizeSession({ orders: [], spaceOuts: 0, peeks: 0, busywork: 0, missedCustomers: 0, cookingTime: 0, stars: 0, coins: 0 },
+    { durationSec: MIN_SESSION_SEC - 10, levelStart: 0, levelEnd: 0, date });
+  commitPending(p);
+  assert.equal(p.stats.sessions.length, 1);
+  assert.equal(p.days[dayKey(date)].playedSec, 95 + MIN_SESSION_SEC - 10);
+  addPlayTime(p, 5, date);
+  assert.equal(p.days[dayKey(date)].playedSec, 100 + MIN_SESSION_SEC - 10);
+});
+
+test('stored profiles are repaired field by field', () => {
+  const raw = {
+    profiles: [{
+      id: 'x', name: 'A very very long name indeed', avatar: 'dinosaur', tutorialDone: 'yes', lastSessionEnd: 'never',
+      days: { '2026-01-05': { playedSec: 'lots', sessions: -3 }, junk: null },
+      stats: { sessions: [null, { orders: 4, success: 3 }, 'nope'] },
+      pending: { durationSec: 'x' },
+    }],
+  };
+  const store = new Store({ getItem: () => JSON.stringify(raw), setItem() {}, removeItem() {} });
+  const p = store.profiles[0];
+  assert.equal(p.name.length, 16);
+  assert.equal(p.avatar, 'fox');
+  assert.equal(p.tutorialDone, true);
+  assert.equal(p.lastSessionEnd, 0);
+  assert.deepEqual(p.days, { '2026-01-05': { playedSec: 0, sessions: 0 } });
+  assert.equal(p.stats.sessions.length, 1);
+  assert.equal(p.pending, null);
+  assert.ok(dayStatus(p, { goalMin: 7, capMin: 20, cooldownMin: 5 }).canPlay);
+});

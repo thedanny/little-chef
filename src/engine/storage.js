@@ -47,6 +47,7 @@ export function createProfile({ name = '', avatar = 'fox' } = {}) {
     },
     days: {}, // dayKey → { playedSec, sessions }
     lastSessionEnd: 0,
+    pending: null, // summary of a session that was interrupted (app closed in the background)
   };
 }
 
@@ -55,6 +56,11 @@ function sanitizeProfile(raw) {
   if (!raw || typeof raw !== 'object') return base;
   const p = { ...base, ...raw };
   p.id = typeof raw.id === 'string' ? raw.id : base.id;
+  p.name = base.name;
+  p.avatar = base.avatar;
+  p.tutorialDone = !!raw.tutorialDone;
+  p.lastSessionEnd = Number.isFinite(+raw.lastSessionEnd) ? +raw.lastSessionEnd : 0;
+  p.created = Number.isFinite(+raw.created) ? +raw.created : base.created;
   p.coins = Math.max(0, Math.floor(+raw.coins || 0));
   p.level = clampLevel(+raw.level || 0);
   p.recent = Array.isArray(raw.recent) ? raw.recent.map(Boolean).slice(-12) : [];
@@ -64,10 +70,18 @@ function sanitizeProfile(raw) {
   p.settings = { ...base.settings, ...(raw.settings || {}) };
   p.settings.override = { enabled: !!raw.settings?.override?.enabled, ...clampDials(raw.settings?.override || {}) };
   p.stats = {
-    sessions: Array.isArray(raw.stats?.sessions) ? raw.stats.sessions.slice(-MAX_SESSIONS_KEPT) : [],
+    sessions: Array.isArray(raw.stats?.sessions)
+      ? raw.stats.sessions.filter((s) => s && typeof s === 'object' && Number.isFinite(+s.orders)).slice(-MAX_SESSIONS_KEPT)
+      : [],
     totals: { ...base.stats.totals, ...(raw.stats?.totals || {}) },
   };
-  p.days = raw.days && typeof raw.days === 'object' ? raw.days : {};
+  p.days = {};
+  if (raw.days && typeof raw.days === 'object') {
+    for (const [key, d] of Object.entries(raw.days)) {
+      if (d && typeof d === 'object') p.days[key] = { playedSec: Math.max(0, +d.playedSec || 0), sessions: Math.max(0, Math.floor(+d.sessions || 0)) };
+    }
+  }
+  p.pending = raw.pending && typeof raw.pending === 'object' && Number.isFinite(+raw.pending.durationSec) ? raw.pending : null;
   return p;
 }
 

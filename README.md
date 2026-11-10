@@ -147,9 +147,11 @@ Add query parameters to the URL:
 
 | Parameter | Effect |
 | --- | --- |
-| `quick=1` | skip the menus and start cooking with the first profile |
+| `quick=1` | skip the menus and start cooking with a throwaway chef (nothing is saved) |
 | `level=0..9` | start at a given level (with `quick`) |
 | `layout=1..3` | force a layout (with `quick`) |
+| `cue=0..3` | force the cue strength (with `quick`) |
+| `all=1` | unlock every recipe, outfit, pet and decoration (with `quick`) |
 | `speed=4` | run the game clock faster |
 | `session=60` | session length in seconds |
 | `bot=1` / `bot=lazy` / `bot=idle` | auto-player: plays well / never does timed steps / never touches anything |

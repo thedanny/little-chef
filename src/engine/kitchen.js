@@ -254,7 +254,8 @@ export class Kitchen {
 
   tapJuice() {
     this.noteInput();
-    const c = this.customers.filter((x) => x && x.juice).sort((a, b) => b.juice.t - a.juice.t)[0];
+    // The customer who has been thirsty the longest (least time left) goes first.
+    const c = this.customers.filter((x) => x && x.juice).sort((a, b) => a.juice.t - b.juice.t)[0];
     if (!c) {
       this.emit('nope', { target: 'juice', reason: 'no-request' });
       return 'nope';
@@ -557,7 +558,9 @@ export class Kitchen {
   creditBusywork(coins, source = null) {
     this.session.busywork++;
     for (const st of this.stationList()) if (st.phase === 'wait') st.busy++;
-    if (coins > 0) {
+    // Chores only pay while an order is on the go: the reward is for staying
+    // busy during cooking, not for tidying an empty kitchen.
+    if (coins > 0 && this.activeCount() > 0) {
       this.session.coins += coins;
       this.emit('coins', { amount: coins, source });
     }

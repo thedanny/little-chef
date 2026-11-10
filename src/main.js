@@ -1,6 +1,8 @@
 // Little Chef – app shell: stage scaling, screen routing, storage and sound.
 
-import { Store } from './engine/storage.js';
+import { Store, createProfile } from './engine/storage.js';
+import { commitPending } from './engine/stats.js';
+import { CATALOG } from './engine/catalog.js';
 import { clampLevel } from './engine/difficulty.js';
 import { sound } from './ui/audio.js';
 import { el } from './ui/art/common.js';
@@ -58,6 +60,8 @@ class App {
     this.stage = el('div', 'stage');
     this.root.append(this.stage);
     this.store = new Store(safeStorage());
+    // A session cut short last time (app closed in the background) still counts.
+    if (this.store.profiles.map((p) => commitPending(p)).some(Boolean)) this.store.save();
     this.sound = sound;
     this.debug = parseDebug();
     sound.setEnabled(this.store.globals.sound);
@@ -84,6 +88,17 @@ class App {
     // Offline play once installed (only on a real https site, never in dev).
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || new URLSearchParams(location.search).has('sw'))) {
       navigator.serviceWorker.register('sw.js').catch(() => {});
+      // The first visit loaded everything before the worker took control, so
+      // put those files in its cache now: one online visit is enough to go offline.
+      navigator.serviceWorker.ready.then(async () => {
+        const here = location.origin;
+        const urls = new Set(['./', 'index.html', 'manifest.webmanifest', 'icon.svg']);
+        for (const e of performance.getEntriesByType('resource')) {
+          if (e.name.startsWith(here)) urls.add(e.name.split('?')[0]);
+        }
+        const cache = await caches.open('little-chef-v1');
+        await Promise.all([...urls].map((u) => cache.add(u).catch(() => {})));
+      }).catch(() => {});
     }
     this.start();
   }
@@ -91,15 +106,17 @@ class App {
   start() {
     const d = this.debug;
     if (d.quick) {
-      let p = this.store.profiles[0];
-      if (!p) p = this.store.addProfile({ name: 'Tester', avatar: 'fox' });
-      if (d.level !== undefined) {
-        p.level = clampLevel(d.level);
-        p.recent = [];
-      }
+      // A throwaway chef that is never saved, so testing cannot touch real profiles.
+      const q = new URLSearchParams(location.search);
+      const p = createProfile({ name: 'Tester', avatar: q.get('avatar') || 'fox' });
+      if (d.level !== undefined) p.level = clampLevel(d.level);
       if (d.layout) p.settings.layout = d.layout;
       if (d.cue !== undefined) p.settings.override = { enabled: true, cue: d.cue, wait: 0, conc: 0 };
-      p.tutorialDone = !new URLSearchParams(location.search).has('tutorial');
+      if (q.has('all')) {
+        p.owned = CATALOG.map((i) => i.id).concat(p.owned);
+        p.equipped = { outfit: 'wizard', pet: 'cat', wall: 'sky', decor: ['plant', 'picture', 'bunting', 'fishbowl'] };
+      }
+      p.tutorialDone = !q.has('tutorial');
       this.go('kitchen', { profile: p });
       return;
     }

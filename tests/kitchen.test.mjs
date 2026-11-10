@@ -361,3 +361,31 @@ test('a full simulated session with a diligent player earns mostly 3 stars', () 
   assert.equal(k.session.spaceOuts, 0);
   assert.ok(k.session.coins > 0);
 });
+
+test('chores only pay coins while an order is on the go', () => {
+  const { k } = make();
+  // Nothing cooking yet: washing is still useful, but unpaid.
+  assert.equal(k.tapSink(), 'wash');
+  run(k, TUNING.wash + 0.1, { keepBusy: true });
+  assert.equal(k.session.coins, 0);
+  assert.equal(k.session.busywork, 1);
+  greetFirst(k);
+  k.tapStation('toaster');
+  k.tapSink();
+  run(k, TUNING.wash + 0.1, { keepBusy: true });
+  assert.equal(k.session.coins, TUNING.busyworkCoin);
+});
+
+test('the jug goes to whoever has been thirsty the longest', () => {
+  const { k } = make({ dials: { conc: 2, wait: 3 }, recipes: ['toast', 'pancakes'] });
+  runUntil(k, () => k.customers.filter(Boolean).length === 2 && k.customers.every((c) => c.state === 'waiting' || c.state === 'ordered'));
+  k.customers.forEach((c) => c.state === 'waiting' && k.tapCustomer(c.slot));
+  const [a, b] = k.customers;
+  a.state = 'cooking';
+  b.state = 'cooking';
+  a.juice = { t: 12 };
+  b.juice = { t: 3 }; // has waited longer
+  assert.equal(k.tapJuice(), 'juice');
+  assert.equal(b.juice, null);
+  assert.ok(a.juice);
+});

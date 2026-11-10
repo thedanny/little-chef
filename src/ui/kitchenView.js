@@ -7,7 +7,7 @@ import { GameClock } from '../engine/clock.js';
 import { RECIPES } from '../engine/recipes.js';
 import { dialsFor, layoutFor, recordOrder, masteryProgress } from '../engine/difficulty.js';
 import { unlockedRecipes } from '../engine/catalog.js';
-import { dayStatus, summarizeSession, applySession } from '../engine/stats.js';
+import { dayStatus, summarizeSession, applySession, addPlayTime, MIN_SESSION_SEC } from '../engine/stats.js';
 import { getLayout } from './layouts.js';
 import { el, C } from './art/common.js';
 import { foodIcon, actionIcon, ingredientIcon } from './art/food.js';
@@ -93,6 +93,7 @@ export class KitchenScreen {
       if (document.hidden) {
         this.clock.pause('hidden');
         this.sound.hold(true);
+        this.savePending();
       } else {
         this.clock.resume('hidden');
         if (!this.clock.paused) this.sound.hold(false);
@@ -101,8 +102,26 @@ export class KitchenScreen {
     };
     this.keepAwake();
     this.onPageHide = () => this.finish({ silent: true });
+    // If the browser brings a closed-out page back, leave the frozen kitchen.
+    this.onPageShow = () => {
+      if (this.finished) this.app.go('hub', { profile: this.profile });
+    };
+    // Held the wrong way up: the "please rotate" picture covers the game, so stop the clock.
+    this.portrait = window.matchMedia('(orientation: portrait) and (max-width: 900px)');
+    this.onPortrait = () => {
+      if (this.portrait.matches) {
+        this.clock.pause('portrait');
+        this.sound.hold(true);
+      } else {
+        this.clock.resume('portrait');
+        if (!this.clock.paused) this.sound.hold(false);
+      }
+    };
+    this.portrait.addEventListener?.('change', this.onPortrait);
+    if (this.portrait.matches) this.onPortrait();
     document.addEventListener('visibilitychange', this.onVisibility);
     window.addEventListener('pagehide', this.onPageHide);
+    window.addEventListener('pageshow', this.onPageShow);
     this.sound.startMusic();
     this.renderMastery();
     this.render(0);
@@ -127,8 +146,11 @@ export class KitchenScreen {
     this.off?.();
     this.sound.stopAllLoops();
     this.sound.stopMusic();
+    clearTimeout(this.holdTimer);
     document.removeEventListener('visibilitychange', this.onVisibility);
     window.removeEventListener('pagehide', this.onPageHide);
+    window.removeEventListener('pageshow', this.onPageShow);
+    this.portrait?.removeEventListener?.('change', this.onPortrait);
   }
 
   place(node, r, z) {
@@ -672,6 +694,7 @@ export class KitchenScreen {
     }
     const cv = this.custViews[slot];
     cv.bubble.classList.add('hidden');
+    cv.jb.classList.add('hidden');
     const dishRect = L.dishes[slot];
     const to = center(dishRect);
     const food = `<div class="${d.burnt ? 'burnt' : ''}" style="width:100%;height:100%">${foodIcon(d.order.recipeId)}</div>`;
@@ -879,11 +902,11 @@ export class KitchenScreen {
       this.ringIco.innerHTML = icon('moon');
       this.pulse(this.ringIco.parentNode, 'bounce');
     }
-    if (this.kitchen.closing) {
+    if (this.kitchen.closing && !this.ending) {
       this.closingFor += dt;
       if (this.kitchen.isDone() || this.closingFor > 100) {
+        this.ending = true;
         this.after(1.2, () => this.finish());
-        this.closingFor = -1e9;
       }
     }
     if (this.chefTimer > 0) {
@@ -1091,7 +1114,7 @@ export class KitchenScreen {
     this.sound.play('tap');
     this.clock.pause('user');
     this.root.classList.add('paused');
-    setTimeout(() => this.sound.hold(true), 120);
+    this.holdTimer = setTimeout(() => this.sound.hold(true), 120);
     const o = this.overlay;
     const g = this.app.store.globals;
     o.className = 'overlay pause-menu';
@@ -1107,6 +1130,7 @@ export class KitchenScreen {
       </div>`;
     o.querySelector('.pause-play').onclick = () => this.resume();
     o.querySelector('.pause-home').onclick = () => {
+      clearTimeout(this.holdTimer);
       this.sound.hold(false);
       this.finish();
     };
@@ -1126,6 +1150,7 @@ export class KitchenScreen {
   }
 
   resume() {
+    clearTimeout(this.holdTimer);
     this.overlay.className = 'overlay hidden';
     this.overlay.innerHTML = '';
     this.root.classList.remove('paused');
@@ -1135,6 +1160,21 @@ export class KitchenScreen {
 
   // ----------------------------------------------------------------- finish
 
+  /** The session so far, as a history record. */
+  summary() {
+    return summarizeSession(this.kitchen.session, { durationSec: this.sessionTime, levelStart: this.levelStart, levelEnd: this.profile.level });
+  }
+
+  /**
+   * Going into the background: leave a provisional record behind, so the play
+   * time still counts if the tablet closes the app before we get to finish().
+   */
+  savePending() {
+    if (this.finished) return;
+    this.profile.pending = this.summary();
+    this.app.store.save();
+  }
+
   finish({ silent = false } = {}) {
     if (this.finished) return;
     this.finished = true;
@@ -1142,10 +1182,14 @@ export class KitchenScreen {
     this.sound.stopAllLoops();
     const p = this.profile;
     const session = this.kitchen.session;
+    p.pending = null;
     let summary = null;
-    if (this.sessionTime >= 5 || session.orders.length) {
-      summary = summarizeSession(session, { durationSec: this.sessionTime, levelStart: this.levelStart, levelEnd: p.level });
+    if (session.orders.length || this.sessionTime >= MIN_SESSION_SEC) {
+      summary = this.summary();
       applySession(p, summary);
+    } else {
+      // Too short to be a session, but the minutes still count toward today.
+      addPlayTime(p, this.sessionTime);
     }
     this.app.store.save();
     if (silent) return;

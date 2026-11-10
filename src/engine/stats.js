@@ -56,6 +56,29 @@ export function applySession(profile, summary) {
   return profile;
 }
 
+/** Shorter visits with no orders count as play time but not as a session. */
+export const MIN_SESSION_SEC = 20;
+
+/** Count play time toward today without adding a session record (very short visits). */
+export function addPlayTime(profile, seconds, date = new Date()) {
+  if (!(seconds > 0)) return;
+  const day = (profile.days[dayKey(date)] ||= { playedSec: 0, sessions: 0 });
+  day.playedSec += Math.round(seconds);
+}
+
+/**
+ * A session that was interrupted (the app was closed while in the background)
+ * left a provisional summary behind: commit it so the play time still counts.
+ */
+export function commitPending(profile) {
+  const pending = profile.pending;
+  profile.pending = null;
+  if (!pending) return false;
+  if (pending.orders > 0 || pending.durationSec >= MIN_SESSION_SEC) applySession(profile, pending);
+  else addPlayTime(profile, pending.durationSec, new Date(pending.date || Date.now()));
+  return true;
+}
+
 /** Dashboard numbers over the most recent `n` sessions (default: all kept). */
 export function aggregate(profile, n = Infinity) {
   const sessions = profile.stats.sessions.slice(-n);
