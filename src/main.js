@@ -79,6 +79,10 @@ class App {
     document.addEventListener('gesturestart', (e) => e.preventDefault());
 
     if (this.debug.expose) globalThis.__app = this;
+    // Offline play once installed (only on a real https site, never in dev).
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || new URLSearchParams(location.search).has('sw'))) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
     this.start();
   }
 

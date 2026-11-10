@@ -137,6 +137,7 @@
   position: absolute; right: -4px; top: -10px; width: 74px; height: 74px; border-radius: 50%;
   border: 5px solid var(--ink); background: #fff; box-shadow: 0 5px 0 rgba(74, 43, 23, .25);
   transform: scale(0); transition: transform .2s var(--pop); z-index: 3; pointer-events: none;
+  scale: var(--s, 1); transform-origin: 100% 0;
 }
 .st-ring.show { transform: scale(1); }
 .st-ring-pie { position: absolute; inset: 5px; border-radius: 50%; background: conic-gradient(var(--green) calc(var(--p, 0) * 1turn), #f1e7d2 0); border: 3px solid var(--ink); }
@@ -151,7 +152,7 @@
 @keyframes bubble-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -9px; } }
 
 /* Ingredient stock. */
-.st-stock { position: absolute; left: 2px; bottom: 4px; display: flex; align-items: center; gap: 4px; padding: 4px 8px 4px 4px; background: #fff; border: 4px solid var(--ink); border-radius: 22px; z-index: 2; pointer-events: none; transform-origin: 0 100%; }
+.st-stock { scale: var(--s, 1); position: absolute; left: 2px; bottom: 4px; display: flex; align-items: center; gap: 4px; padding: 4px 8px 4px 4px; background: #fff; border: 4px solid var(--ink); border-radius: 22px; z-index: 2; pointer-events: none; transform-origin: 0 100%; }
 .st-stock .ing { width: 30px; height: 30px; display: block; }
 .st-stock i { width: 12px; height: 12px; border-radius: 50%; border: 3px solid var(--ink); background: #efe5d3; }
 .st-stock i.on { background: var(--green); }

@@ -50,11 +50,11 @@ const layout1 = {
   decor: {
     window: { x: 1072, y: 92, w: 190, h: 171 },
     clock: { x: 230, y: 112, w: 76, h: 76 },
-    picture: { x: 586, y: 96, w: 108, h: 94 },
+    picture: { x: 962, y: 128, w: 92, h: 80 },
     plant: { x: 40, y: 128, w: 68, h: 95 },
     fishbowl: { x: 124, y: 150, w: 70, h: 70 },
-    bunting: { x: 226, y: 84, w: 828, h: 62 },
-    lights: { x: 226, y: 84, w: 828, h: 54 },
+    bunting: { x: 318, y: 92, w: 640, h: 56 },
+    lights: { x: 226, y: 80, w: 828, h: 46 },
   },
   z: { customers: 2, counter: 3, counterItems: 4, props: 4, pet: 5, chef: 6, worktop: 7, stations: 8 },
 };
@@ -106,13 +106,13 @@ const layout2 = {
   spills: [
     { x: 716, y: 440 }, { x: 892, y: 440 }, { x: 1034, y: 440 }, { x: 1210, y: 440 },
   ],
-  chef: { mode: 'free', w: 124, h: 223, homeX: 600, homeY: 420, laneX: 598, z: 6 },
+  chef: { mode: 'free', w: 124, h: 223, homeX: 600, homeY: 420, laneX: 598, diningX: 901, diningY: 404, z: 6 },
   decor: {
     window: { x: 668, y: 98, w: 136, h: 122 },
     clock: { x: 1040, y: 100, w: 72, h: 72 },
     picture: { x: 915, y: 236, w: 96, h: 84 },
     plant: { x: 836, y: 690, w: 0, h: 0 },
-    fishbowl: { x: 884, y: 590, w: 64, h: 64 },
+    fishbowl: { x: 720, y: 494, w: 62, h: 62 },
     bunting: { x: 664, y: 84, w: 612, h: 44 },
     lights: { x: 664, y: 84, w: 612, h: 40 },
   },

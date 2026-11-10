@@ -17,6 +17,7 @@ import { scene1, scene2, scene3, tableSvg, pawsSvg, windowSvg, skyAt } from './a
 import { Fx } from './fx.js';
 
 const CUE_LOOP = [1, 0.7, 0.35, 0];
+const PULSES = ['bounce', 'shake', 'peek', 'act', 'act-flip', 'hop', 'look', 'joy', 'pop-in'];
 const COOKING = new Set(['wait', 'ready', 'late']);
 const center = (r) => ({ x: r.x + (r.w ?? r.size) / 2, y: r.y + (r.h ?? r.size) / 2 });
 
@@ -234,6 +235,7 @@ export class KitchenScreen {
         <div class="st-stock"><span class="ing">${ingredientIcon(st.id)}</span><i></i><i></i><i></i></div>`);
       node.dataset.id = st.id;
       node.dataset.phase = 'idle';
+      node.style.setProperty('--s', Math.max(0.72, Math.min(1, r.w / 240)).toFixed(2));
       this.root.append(this.place(node, r, L.z.stations));
       node.addEventListener('pointerdown', () => this.tapStation(st.id));
       this.stationViews[st.id] = {
@@ -357,7 +359,8 @@ export class KitchenScreen {
   tapPlate(slot) {
     if (this.clock.paused) return;
     this.input();
-    this.kitchen.tapPlate(slot);
+    const r = this.kitchen.tapPlate(slot);
+    if (r === 'collected') this.moveChef(this.layout.dishes[slot], 'customer');
   }
 
   // ------------------------------------------------------------------- chef
@@ -389,6 +392,10 @@ export class KitchenScreen {
       if (kind === 'station') {
         x = c.laneX - c.w / 2;
         y = r.y + h / 2 - c.h * 0.5;
+      } else if (kind === 'customer') {
+        // Stand between the two tables so nobody's face gets covered.
+        x = c.diningX;
+        y = c.diningY;
       } else {
         x = Math.max(640, Math.min(1150, r.x - c.w * 0.55));
         y = r.y + h - c.h + 30;
@@ -400,8 +407,9 @@ export class KitchenScreen {
     this.pulse(this.chefEl, 'hop');
   }
 
+  /** Play a one-shot CSS animation class, clearing any earlier one first. */
   pulse(node, cls) {
-    node.classList.remove(cls);
+    node.classList.remove(...PULSES);
     void node.offsetWidth;
     node.classList.add(cls);
   }

@@ -36,6 +36,7 @@ export class Sound {
       for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     }
     if (this.ctx.state === 'suspended' && !this.held) this.ctx.resume();
+    if (this.wantMusic && !this.musicTimer) this.startMusic();
   }
 
   get ready() {
@@ -422,6 +423,7 @@ export class Sound {
   // ---------------------------------------------------------------- music
 
   startMusic() {
+    this.wantMusic = true;
     if (this.musicTimer || !this.ctx) return;
     this.musicStep = 0;
     this.musicNext = this.ctx.currentTime + 0.1;
@@ -449,6 +451,7 @@ export class Sound {
   }
 
   stopMusic() {
+    this.wantMusic = false;
     if (this.musicTimer) clearInterval(this.musicTimer);
     this.musicTimer = null;
   }
