@@ -245,3 +245,12 @@
 .pet { transform-origin: 50% 100%; }
 .pet.bounce { animation: chef-hop .4s ease-out 2; }
 .jug.bounce { animation: bounce .5s var(--pop) 2; }
+
+/* Food chip on an idle station that has an order waiting. */
+.st-want {
+  position: absolute; left: -8px; top: -18px; width: 78px; height: 78px; padding: 8px;
+  background: #fff; border: 5px solid var(--green-dark); border-radius: 50%; box-shadow: 0 5px 0 rgba(74, 43, 23, .25);
+  transform: scale(0); transition: transform .22s var(--pop); z-index: 3; pointer-events: none;
+  scale: var(--s, 1); transform-origin: 0 0;
+}
+.st-want.show { transform: scale(1); animation: bubble-bob .9s ease-in-out infinite; }

@@ -4,6 +4,7 @@
 
 import { Kitchen } from '../engine/kitchen.js';
 import { GameClock } from '../engine/clock.js';
+import { RECIPES } from '../engine/recipes.js';
 import { dialsFor, layoutFor, recordOrder, masteryProgress } from '../engine/difficulty.js';
 import { unlockedRecipes } from '../engine/catalog.js';
 import { dayStatus, summarizeSession, applySession } from '../engine/stats.js';
@@ -244,6 +245,7 @@ export class KitchenScreen {
         <div class="st-shimmer"><i></i><i></i><i></i></div>
         <div class="st-ring"><div class="st-ring-pie"></div></div>
         <div class="st-bubble"></div>
+        <div class="st-want"></div>
         <div class="st-stock"><span class="ing">${ingredientIcon(st.id)}</span><i></i><i></i><i></i></div>`);
       node.dataset.id = st.id;
       node.dataset.phase = 'idle';
@@ -257,6 +259,8 @@ export class KitchenScreen {
         ring: node.querySelector('.st-ring'),
         pie: node.querySelector('.st-ring-pie'),
         bubble: node.querySelector('.st-bubble'),
+        want: node.querySelector('.st-want'),
+        wanted: null,
         pips: [...node.querySelectorAll('.st-stock i')],
         stockEl: node.querySelector('.st-stock'),
         key: null,
@@ -315,6 +319,7 @@ export class KitchenScreen {
     this.sound.unlock();
     this.idleReal = 0;
     this.hand.classList.add('hidden');
+    try { navigator.vibrate?.(8); } catch { /* no haptics */ }
   }
 
   tapCustomer(slot) {
@@ -891,7 +896,24 @@ export class KitchenScreen {
 
   render(dt) {
     const k = this.kitchen;
-    for (const st of k.stationList()) this.renderStation(this.stationViews[st.id], st, dt);
+    // Which idle stations have an order waiting for them (shown as a food chip:
+    // matching the order to a station is not the memory task, so it is always shown).
+    const wanted = {};
+    if (k.activeCount() < k.maxConcurrent()) {
+      for (const c of k.customers) {
+        if (c && c.state === 'ordered') wanted[RECIPES[c.recipeId].station] ||= c.recipeId;
+      }
+    }
+    for (const st of k.stationList()) {
+      const v = this.stationViews[st.id];
+      this.renderStation(v, st, dt);
+      const want = st.phase === 'idle' ? wanted[st.id] || null : null;
+      if (want !== v.wanted) {
+        v.wanted = want;
+        if (want) v.want.innerHTML = foodIcon(want);
+        v.want.classList.toggle('show', !!want);
+      }
+    }
 
     // Sink and fridge.
     const washing = k.sink.washing > 0;

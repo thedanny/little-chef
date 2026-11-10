@@ -56,7 +56,15 @@ export class HubScreen {
       // The kitchen is resting: a sleepy chef, no words needed.
       root.classList.add('resting');
       root.querySelector('.hub-chef').insertAdjacentHTML('beforeend', '<div class="zzz"><b>z</b><b>z</b><b>z</b></div>');
+      // Wake up by itself when the cool-down ends or a new day starts.
+      this.timer = setInterval(() => {
+        if (dayStatus(p, app.store.globals).canPlay) app.go('hub', { profile: p });
+      }, 5000);
     }
     return root;
+  }
+
+  destroy() {
+    if (this.timer) clearInterval(this.timer);
   }
 }
